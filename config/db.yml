@@ -1,0 +1,6 @@
+adapter: mysql # mysql postgres sqlite3
+host: localhost
+port: 3306
+name: iris-project
+user: root
+password: 123
