@@ -12,6 +12,7 @@ require (
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
+	github.com/howeyc/fsnotify v0.9.0 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/iris-contrib/formBinder v5.0.0+incompatible // indirect
 	github.com/iris-contrib/middleware/cors v0.0.0-20191219204441-78279b78a367
@@ -28,6 +29,8 @@ require (
 	github.com/nats-io/nats-server/v2 v2.1.6 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/silenceper/gowatch v0.0.0-20200226025740-71916d322263 // indirect
+	github.com/silenceper/log v0.0.0-20171204144354-e5ac7fa8a76a // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/valyala/fasthttp v1.12.0 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
@@ -36,4 +39,5 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0 // indirect
 )

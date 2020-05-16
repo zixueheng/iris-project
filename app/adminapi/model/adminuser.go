@@ -14,18 +14,21 @@ import (
 )
 
 // AdminUser 模型
+//
+// Token使用JWT(生成后由客户端持有，请求时发送到服务器进行验证)无需保存数据库；
+// RefreshToken 随机生成32位字符串保存到Redis中，也无需保存到数据库
 type AdminUser struct {
 	gorm.Model
-	Username            string `gorm:"type:varchar(100);unique_index;not null"`
-	Password            string `gorm:"type:varchar(100);not null"`
-	Token               string
-	TokenExpired        time.Time
-	RefreshToken        string
-	RefreshTokenExpired time.Time
-	Role                Role
-	RoleID              uint
-	Phone               string `gorm:"type:char(11);not null"`
-	Status              int8   `gorm:"type:tinyint(1);default:1"`
+	Username string `gorm:"type:varchar(100);unique_index;not null"`
+	Password string `gorm:"type:varchar(100);not null"`
+	// Token               string
+	// TokenExpired        time.Time
+	// RefreshToken        string
+	// RefreshTokenExpired time.Time
+	RoleID uint
+	Role   Role
+	Phone  string `gorm:"type:char(11);not null"`
+	Status int8   `gorm:"type:tinyint(1);default:1"`
 }
 
 // FindOne 查找一个
@@ -50,8 +53,8 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 	} else {
 		if bcrypt.Match(loginInfo.Password, au.Password) {
 			var now = time.Now()
-			var tokenExpired = now.Add(time.Minute * time.Duration(10))
-			var refreshTokenExpired = now.Add(time.Minute * time.Duration(30))
+			var tokenExpired = now.Add(time.Minute * time.Duration(3))
+			// var refreshTokenExpired = now.Add(time.Minute * time.Duration(10))
 
 			// 获取一个 Token，参数一：签名方法、参数二：要保存的数据
 			token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -65,13 +68,17 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 
 			refreshToken := util.GetRandomString(32)
 
-			au.Token = tokenString
-			au.TokenExpired = tokenExpired
-			au.RefreshToken = refreshToken
-			au.RefreshTokenExpired = refreshTokenExpired
-			global.Db.Save(au) // 保存 token 等信息
+			// au.Token = tokenString
+			// au.TokenExpired = tokenExpired
+			// au.RefreshToken = refreshToken
+			// au.RefreshTokenExpired = refreshTokenExpired
+			// global.Db.Save(au) // 保存 token 等信息
 
-			// TODO 这里 token等信息最好保存到 Redis 里面
+			// 保持刷新token到Redis中，有效时间30分钟
+			err := global.Redis.Set("refresh_token_admin_"+util.ParseString(int(au.ID)), refreshToken, time.Minute*time.Duration(10)).Err()
+			if err != nil {
+				panic(err)
+			}
 
 			response := struct {
 				Token        string `json:"token"`

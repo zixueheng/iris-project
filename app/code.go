@@ -1,12 +1,15 @@
 package app
 
+// Code 响应码
+type Code int
+
 // 主要Code
 const (
-	CodeSucceed   = 200
-	CodeFailed    = 500
-	CodeForbidden = 403
-	CodeNotFound  = 404
-	CodeCustom    = 999 // 自定义错误
+	CodeSucceed   Code = 200
+	CodeFailed    Code = 500
+	CodeForbidden Code = 403
+	CodeNotFound  Code = 404
+	CodeCustom    Code = 999 // 自定义错误
 )
 
 // 会员相关Code
@@ -19,15 +22,13 @@ const (
 // Token相关Code
 const (
 	CodeTokenExpired Code = iota + 2000
+	CodeRefreshTokenExpired
 )
 
 // 权限相关code
 const (
 	CodeNotAllowed Code = iota + 5000 // 没有权限
 )
-
-// Code 响应码
-type Code int
 
 // 定义系统内部消息，模拟枚举类型，code = CodeCustom时返回msg
 func (code Code) String(msg string) string {
@@ -53,6 +54,8 @@ func (code Code) String(msg string) string {
 
 	case CodeTokenExpired:
 		return "当前会话已过期"
+	case CodeRefreshTokenExpired:
+		return "刷新Token已过期，请重新登陆"
 
 	case CodeNotAllowed:
 		return "没有操作权限"

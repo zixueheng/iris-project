@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"iris-project/app"
 	"iris-project/config"
 	"iris-project/lib/util"
@@ -22,9 +21,7 @@ func Auth(ctx iris.Context) {
 	adminUseID := data["admin_user_id"].(string)
 	exp := data["exp"].(string)
 
-	fmt.Println(adminUseID, exp)
-
-	// iris.StatusOK
+	// fmt.Println(adminUseID, exp)
 
 	expObj, err := time.ParseInLocation(config.App.Timeformat, exp, time.Local)
 	if err != nil { // 过期时间解析错误，返回 BadRequest
@@ -40,6 +37,6 @@ func Auth(ctx iris.Context) {
 		ctx.StopExecution()
 		return
 	}
-	ctx.Values().Set("auth_admin_user_id", util.ParseInt(adminUseID, 0))
+	ctx.Values().Set("auth_admin_user_id", util.ParseInt(adminUseID, 0)) // 将 admin_user_id 存储到 ctx 中 以共享
 	ctx.Next()
 }
