@@ -15,10 +15,10 @@ import (
 // 实用函数
 
 // ParseInt string转换int
-func ParseInt(b string, defInt int) int {
+func ParseInt(b string) int {
 	id, err := strconv.Atoi(b)
 	if err != nil {
-		return defInt
+		panic(err)
 	} else {
 		return id
 	}

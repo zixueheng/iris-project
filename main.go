@@ -20,7 +20,7 @@ import (
 func main() {
 	app := NewApp()
 
-	app.Logger().SetLevel("info")
+	app.Logger().SetLevel("debug")
 
 	file := NewLogFile()
 	defer file.Close()

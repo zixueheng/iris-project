@@ -26,5 +26,5 @@ func loadAdminAPIController(app *mvc.Application) {
 	// 以下控制器路由都需要验证 token
 	app.Router.Use(middleware.JwtHandler().Serve, adminapimiddleware.Auth)
 	app.Handle(new(controller.User))
-	app.Handle(new(controller.Car))
+	app.Handle(new(controller.Goods))
 }

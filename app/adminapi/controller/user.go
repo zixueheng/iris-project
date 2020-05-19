@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"iris-project/app/model"
-
 	"github.com/kataras/iris/v12"
 )
 
@@ -15,8 +13,12 @@ type User struct {
 func (u *User) GetUserBy(username string, age uint, birthday string) string {
 	u.Ctx.Application().Logger().Info("adminapi get: " + username)
 
-	user := model.User{Name: username, Age: age, Birthday: birthday}
-	user.CreateUser()
+	// user := model.User{Name: username, Age: age, Birthday: birthday}
+	// user.CreateUser()
 
 	return "adminapi get: " + username
+}
+
+func (u *User) PostUser() string {
+	return "user post "
 }

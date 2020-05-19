@@ -1,0 +1,10 @@
+package global
+
+// 系统常量
+
+const (
+	// AdminTokenMinutes 管理员Token有效期/分钟
+	AdminTokenMinutes = 6 * 60
+	// AdminRefreshTokenMinutes 管理员RefreshToken 有效期/分钟
+	AdminRefreshTokenMinutes = 24 * 60
+)
