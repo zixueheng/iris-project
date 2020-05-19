@@ -70,7 +70,7 @@ func Auth(ctx iris.Context) {
 		if role.GetRoleByID(adminUser.RoleID) { // 加载角色包括角色的菜单
 			adminUser.Role = *role
 			json, _ := json.Marshal(adminUser)
-			global.Redis.Set("vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(60)) // 账号信息保存到redis
+			global.Redis.Set("vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
 
 			if adminUser.Role.Tag != "superadmin" { // 不是超级管理员 检查权限
 				if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {

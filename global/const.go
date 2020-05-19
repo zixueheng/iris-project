@@ -7,4 +7,6 @@ const (
 	AdminTokenMinutes = 6 * 60
 	// AdminRefreshTokenMinutes 管理员RefreshToken 有效期/分钟
 	AdminRefreshTokenMinutes = 24 * 60
+	// AdminUserCacheMinutes 管理员信息缓存时间/分钟
+	AdminUserCacheMinutes = 60
 )
