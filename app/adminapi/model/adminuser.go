@@ -4,7 +4,6 @@ import (
 	"iris-project/app"
 	"iris-project/app/adminapi/validate"
 	"iris-project/global"
-	"time"
 
 	"github.com/jameskeane/bcrypt"
 	"github.com/jinzhu/gorm"
@@ -16,18 +15,15 @@ import (
 // RefreshToken 随机生成32位字符串保存到Redis中，也无需保存到数据库
 type AdminUser struct {
 	// gorm.Model
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	Username  string `gorm:"type:varchar(100);unique_index;not null"`
-	Password  string `gorm:"type:varchar(100);not null"`
-	// Token               string
-	// TokenExpired        time.Time
-	// RefreshToken        string
-	// RefreshTokenExpired time.Time
-	RoleID uint
-	Role   Role
-	Phone  string `gorm:"type:char(11);not null"`
-	Status int8   `gorm:"type:tinyint(1);default:1"`
+	ID        uint           `gorm:"primary_key"`
+	CreatedAt global.SQLTime `gorm:"type:datetime;"`
+	UpdatedAt global.SQLTime `gorm:"type:datetime;"`
+	Username  string         `gorm:"type:varchar(100);unique_index;not null"`
+	Password  string         `gorm:"type:varchar(100);not null"`
+	RoleID    uint
+	Role      Role
+	Phone     string `gorm:"type:char(11);not null"`
+	Status    int8   `gorm:"type:tinyint(1);default:1"`
 }
 
 // FindOne 查找一个

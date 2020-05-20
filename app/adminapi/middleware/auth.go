@@ -24,29 +24,22 @@ func Auth(ctx iris.Context) {
 	// 	ctx.Writef("%s = %s\n", key, value)
 	// }
 
-	var badRequest = func(err error) {
-		ctx.Application().Logger().Error(err)
-		ctx.StatusCode(iris.StatusBadRequest)
-		ctx.StopExecution()
-		return
-	}
-
 	var adminUseID, exp string
 	if value, ok := data["admin_user_id"]; ok {
 		adminUseID = value.(string)
 	} else {
-		badRequest(errors.New("AdminUserID is empty"))
+		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有admin_user_id"))
 	}
 
 	if value, ok := data["exp"]; ok {
 		exp = value.(string)
 	} else {
-		badRequest(errors.New("Exp is empty"))
+		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有exp"))
 	}
 
 	expObj, err := time.ParseInLocation(config.App.Timeformat, exp, time.Local)
 	if err != nil { // 过期时间解析错误，返回 BadRequest
-		badRequest(err)
+		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, err)
 	}
 
 	if expObj.Before(time.Now()) { // Token 超时
@@ -59,7 +52,6 @@ func Auth(ctx iris.Context) {
 	cacheAdminUser, err := global.Redis.Get("vo_admin_user_" + adminUseID).Result() // 加载redis中账号信息
 	if err == redis.Nil {
 		// fmt.Println("走数据库")
-
 		if !adminUser.GetAdminUserByID(util.ParseInt(adminUseID)) {
 			ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil)) // 账号不存在
 			ctx.StopExecution()
@@ -96,7 +88,7 @@ func Auth(ctx iris.Context) {
 		}
 	}
 
-	ctx.Values().Set("auth_admin_user_id", util.ParseInt(adminUseID)) // 将 admin_user_id 存储到 ctx 中 以共享
+	ctx.Values().Set("auth_admin_user", adminUser) // 将 admin_user 存储到 ctx 中 以共享
 	ctx.Next()
 }
 

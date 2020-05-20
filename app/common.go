@@ -15,7 +15,6 @@ import (
 
 // CheckRequest 检查请求参数，返回错误提示
 func CheckRequest(ctx iris.Context, obj interface{}) (errmsg string) {
-
 	if err := ctx.ReadJSON(obj); err != nil {
 		// p.Ctx.StatusCode(iris.StatusOK)
 		// _, _ = ctx.JSON(APIData(false, nil, err.Error()))
@@ -68,4 +67,12 @@ func GenTokenAndRefreshToken(key string, id int, tokenMinutes, refreshTokenMinut
 		panic(err)
 	}
 	return tokenString, refreshToken
+}
+
+// ResponseProblemHTTPCode 响应http错误码
+func ResponseProblemHTTPCode(ctx iris.Context, code int, err error) {
+	ctx.Application().Logger().Error(ctx.Path(), ": ", err)
+	ctx.StatusCode(code)
+	ctx.StopExecution()
+	return
 }

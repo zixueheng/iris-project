@@ -2,16 +2,15 @@ package model
 
 import (
 	"iris-project/global"
-
-	"github.com/jinzhu/gorm"
 )
 
 // User 模型
 type User struct {
-	gorm.Model
-	Name     string
-	Age      uint
-	Birthday string
+	ID        uint           `gorm:"primary_key"`
+	CreatedAt global.SQLTime `gorm:"type:timestamp;"`
+	Name      string
+	Age       uint
+	Birthday  string
 }
 
 // CreateUser 创建用户

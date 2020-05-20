@@ -21,48 +21,52 @@ type Public struct {
 
 // GetInit 初始化数据
 func (p *Public) GetInit() string {
-	adminUser := model.AdminUser{
-		Username: "admin",
-		Password: util.HashPassword("123456"),
-		Role: model.Role{
-			Name:   "超级管理员",
-			Tag:    "superadmin",
-			Status: 1,
-		},
-		// RoleID:   role.ID,
-		Phone:  "15215657185",
-		Status: 1,
-	}
-	global.Db.Create(&adminUser)
+	// adminUser := model.AdminUser{
+	// 	Username: "admin",
+	// 	Password: util.HashPassword("123456"),
+	// 	Role: model.Role{
+	// 		Name:   "超级管理员",
+	// 		Tag:    "superadmin",
+	// 		Status: 1,
+	// 	},
+	// 	// RoleID:   role.ID,
+	// 	Phone:  "15215657185",
+	// 	Status: 1,
+	// }
+	// global.Db.Create(&adminUser)
 
-	role := model.Role{
-		Name: "商品管理员",
-		Tag:  "goods_manager",
-		Menus: []model.Menu{
-			{ID: 1, PID: 0, Name: "商品列表", Type: "menu", APIPath: "/adminapi/goodslist/%v/%v", Method: "GET", Sort: 1, Status: 1},
-			{ID: 2, PID: 1, Name: "商品详情", Type: "api", APIPath: "/adminapi/goods/%v", Method: "GET", Sort: 0, Status: 1},
-			{ID: 3, PID: 1, Name: "商品编辑", Type: "api", APIPath: "/adminapi/goods/%v", Method: "POST", Sort: 0, Status: 1},
-			{ID: 4, PID: 1, Name: "商品删除", Type: "api", APIPath: "/adminapi/goods/%v", Method: "DELETE", Sort: 0, Status: 1},
-			{ID: 5, PID: 0, Name: "商品分类", Type: "menu", APIPath: "/adminapi/categorylist/%v/%v", Method: "GET", Sort: 2, Status: 1},
-			{ID: 6, PID: 5, Name: "商品分类详情", Type: "api", APIPath: "/adminapi/category/%v", Method: "GET", Sort: 0, Status: 1},
-			{ID: 7, PID: 5, Name: "商品分类编辑", Type: "api", APIPath: "/adminapi/category/%v", Method: "POST", Sort: 0, Status: 1},
-			{ID: 8, PID: 5, Name: "商品分类删除", Type: "api", APIPath: "/adminapi/category/%v", Method: "DELETE", Sort: 0, Status: 1},
-		},
-		Status: 1,
-	}
-	global.Db.Create(&role)
+	// role := model.Role{
+	// 	Name: "商品管理员",
+	// 	Tag:  "goods_manager",
+	// 	Menus: []model.Menu{
+	// 		{ID: 1, PID: 0, Name: "商品列表", Type: "menu", APIPath: "/adminapi/goodslist/%v/%v", Method: "GET", Sort: 1, Status: 1},
+	// 		{ID: 2, PID: 1, Name: "商品详情", Type: "api", APIPath: "/adminapi/goods/%v", Method: "GET", Sort: 0, Status: 1},
+	// 		{ID: 3, PID: 1, Name: "商品编辑", Type: "api", APIPath: "/adminapi/goods/%v", Method: "POST", Sort: 0, Status: 1},
+	// 		{ID: 4, PID: 1, Name: "商品删除", Type: "api", APIPath: "/adminapi/goods/%v", Method: "DELETE", Sort: 0, Status: 1},
+	// 		{ID: 5, PID: 0, Name: "商品分类", Type: "menu", APIPath: "/adminapi/categorylist/%v/%v", Method: "GET", Sort: 2, Status: 1},
+	// 		{ID: 6, PID: 5, Name: "商品分类详情", Type: "api", APIPath: "/adminapi/category/%v", Method: "GET", Sort: 0, Status: 1},
+	// 		{ID: 7, PID: 5, Name: "商品分类编辑", Type: "api", APIPath: "/adminapi/category/%v", Method: "POST", Sort: 0, Status: 1},
+	// 		{ID: 8, PID: 5, Name: "商品分类删除", Type: "api", APIPath: "/adminapi/category/%v", Method: "DELETE", Sort: 0, Status: 1},
+	// 	},
+	// 	Status: 1,
+	// }
+	// global.Db.Create(&role)
 
-	goodseditor := model.AdminUser{
-		Username: "goodseditor",
-		Password: util.HashPassword("123456"),
-		// Role: model.Role{
-		// 	Model: gorm.Model{ID:2},
-		// },
-		RoleID: 2,
-		Phone:  "13721047437",
-		Status: 1,
-	}
-	global.Db.Create(&goodseditor)
+	// goodseditor := model.AdminUser{
+	// 	Username: "goodseditor",
+	// 	Password: util.HashPassword("123456"),
+	// 	// Role: model.Role{
+	// 	// 	Model: gorm.Model{ID:2},
+	// 	// },
+	// 	RoleID: 2,
+	// 	Phone:  "13721047437",
+	// 	Status: 1,
+	// }
+	// global.Db.Create(&goodseditor)
+
+	// admin1 := new(model.AdminUser)
+	// admin1.ID = 1
+	// global.Db.Model(admin1).Update("phone", "16666666666")
 
 	return "ok"
 }

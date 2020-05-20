@@ -1,14 +1,14 @@
 # Iris project
-Iris + Gorm
+Iris MVC + Gorm + MySQL + Redis
 
 # API
 
 ## 登录
-请求：
+Request:
 URL：http://localhost:8080/adminapi/login
 Method: Post
 Body: `{"username":"admin","password":"123456"}`
-响应：
+Response:
 ```json
 {
     "success": true,
@@ -22,12 +22,12 @@ Body: `{"username":"admin","password":"123456"}`
 ```
 
 ## 刷新Token
-请求：
+Request:
 URL: http://localhost:8080/adminapi/refreshtoken
 Method: Post
 Header: authorization: bearer token(登录获取的token)
 Body: `{"refresh_token": "pgdtfy56PtyRb2F59lwFbquK1Tnanz5EpfTwiBdPGD6BCEv2JHp8Kb6XJoQUpaE3"}`
-响应：
+Response:
 ```json
 {
     "success": true,
