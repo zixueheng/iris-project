@@ -9,13 +9,12 @@ import (
 // Role 角色model
 type Role struct {
 	// gorm.Model
-	ID uint `gorm:"primary_key"`
-	// CreatedAt time.Time
-	CreatedAt global.SQLTime `gorm:"type:datetime;"`
-	Name      string         `gorm:"type:varchar(50);not null"`
-	Tag       string         `gorm:"type:varchar(50);unique"`
-	Menus     []Menu         `gorm:"many2many:role_menu;"`
-	Status    int8           `gorm:"type:tinyint(1);default:1"`
+	ID        uint           `gorm:"primary_key" json:"id"`
+	CreatedAt global.SQLTime `gorm:"type:datetime;" json:"created_at"`
+	Name      string         `gorm:"type:varchar(50);not null" json:"name"`
+	Tag       string         `gorm:"type:varchar(50);unique" json:"tag"`
+	Menus     []Menu         `gorm:"many2many:role_menu;" json:"menus"`
+	Status    int8           `gorm:"type:tinyint(1);default:1" json:"status"`
 }
 
 // GetRoleByID 根据ID获取角色（包含菜单）
@@ -24,15 +23,4 @@ func (r *Role) GetRoleByID(id uint) bool {
 		return false
 	}
 	return true
-}
-
-// CreateRole 创建管理员
-func (r *Role) CreateRole() error {
-	if global.Db.NewRecord(r) {
-		if err := global.Db.Create(&r).Error; err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

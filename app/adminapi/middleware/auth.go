@@ -51,8 +51,7 @@ func Auth(ctx iris.Context) {
 	var adminUser = new(model.AdminUser)
 	cacheAdminUser, err := global.Redis.Get("vo_admin_user_" + adminUseID).Result() // 加载redis中账号信息
 	if err == redis.Nil {
-		// fmt.Println("走数据库")
-		if !adminUser.GetAdminUserByID(util.ParseInt(adminUseID)) {
+		if !adminUser.GetAdminUserByID(uint(util.ParseInt(adminUseID))) {
 			ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil)) // 账号不存在
 			ctx.StopExecution()
 			return
@@ -64,7 +63,7 @@ func Auth(ctx iris.Context) {
 			json, _ := json.Marshal(adminUser)
 			global.Redis.Set("vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
 
-			if adminUser.Role.Tag != "superadmin" { // 不是超级管理员 检查权限
+			if adminUser.Role.Tag != global.SuperAdminUserTag { // 不是超级管理员 检查权限
 				if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {
 					ctx.JSON(app.APIData(false, app.CodeNotAllowed, "", nil))
 					ctx.StopExecution()
@@ -77,9 +76,8 @@ func Auth(ctx iris.Context) {
 			return
 		}
 	} else {
-		// fmt.Println("走缓存")
 		json.Unmarshal([]byte(cacheAdminUser), adminUser)
-		if adminUser.Role.Tag != "superadmin" { // 不是超级管理员 检查权限
+		if adminUser.Role.Tag != global.SuperAdminUserTag { // 不是超级管理员 检查权限
 			if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {
 				ctx.JSON(app.APIData(false, app.CodeNotAllowed, "", nil))
 				ctx.StopExecution()
@@ -87,7 +85,6 @@ func Auth(ctx iris.Context) {
 			}
 		}
 	}
-
 	ctx.Values().Set("auth_admin_user", adminUser) // 将 admin_user 存储到 ctx 中 以共享
 	ctx.Next()
 }
@@ -98,11 +95,10 @@ func checkRight(adminUser *model.AdminUser, path, method string) (hasRight bool)
 	hasRight = false
 	menus := adminUser.Role.Menus
 	for _, menu := range menus {
-		if menu.APIPath == path && strings.ToUpper(menu.Method) == strings.ToUpper(method) {
+		if menu.Type == "api" && menu.APIPath == path && strings.ToUpper(menu.Method) == strings.ToUpper(method) {
 			hasRight = true
 			return
 		}
 	}
-
 	return
 }

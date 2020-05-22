@@ -17,6 +17,7 @@ var App = struct {
 	Port       uint
 	Timeformat string
 	Jwtsecret  string
+	LogLevel   string
 }{}
 
 func init() {

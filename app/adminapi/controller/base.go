@@ -8,7 +8,7 @@ import (
 	"github.com/kataras/iris/v12"
 )
 
-// GetAuthAdminUser 获取AdminUser
+// GetAuthAdminUser 获取AuthAdminUser
 func GetAuthAdminUser(ctx iris.Context) *model.AdminUser {
 	entry, ok := ctx.Values().GetEntry("auth_admin_user")
 	if !ok {

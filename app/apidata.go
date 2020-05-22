@@ -10,8 +10,8 @@ type Response struct {
 
 // List 分页数据格式
 type List struct {
-	Data  interface{} `json:"data"`
-	Total int         `json:"total"`
+	List  interface{} `json:"list"`
+	Total uint        `json:"total"`
 }
 
 // APIData 返回响应数据

@@ -15,6 +15,7 @@ var DB = struct {
 	Name     string
 	User     string
 	Password string
+	Debug    bool
 }{}
 
 func init() {

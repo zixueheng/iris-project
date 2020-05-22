@@ -21,57 +21,70 @@ type Public struct {
 
 // GetInit 初始化数据
 func (p *Public) GetInit() string {
-	// adminUser := model.AdminUser{
-	// 	Username: "admin",
-	// 	Password: util.HashPassword("123456"),
-	// 	Role: model.Role{
-	// 		Name:   "超级管理员",
-	// 		Tag:    "superadmin",
-	// 		Status: 1,
-	// 	},
-	// 	// RoleID:   role.ID,
-	// 	Phone:  "15215657185",
-	// 	Status: 1,
-	// }
-	// global.Db.Create(&adminUser)
+	global.Db.AutoMigrate(
+		// &model.User{},
+		&model.Menu{},
+		&model.Role{},
+		&model.AdminUser{},
+		&model.RoleMenu{},
+	)
+	// AutoMigrate 会忽略外键，需手动添加（建议直接到数据库中添加）
+	// 参数分别为模型外键，关联表主键，删除级联，修改级联
+	global.Db.Model(&model.RoleMenu{}).AddForeignKey("role_id", "iris_role(id)", "CASCADE", "CASCADE")
+	global.Db.Model(&model.RoleMenu{}).AddForeignKey("menu_id", "iris_menu(id)", "CASCADE", "CASCADE")
 
-	// role := model.Role{
-	// 	Name: "商品管理员",
-	// 	Tag:  "goods_manager",
-	// 	Menus: []model.Menu{
-	// 		{ID: 1, PID: 0, Name: "商品列表", Type: "menu", APIPath: "/adminapi/goodslist/%v/%v", Method: "GET", Sort: 1, Status: 1},
-	// 		{ID: 2, PID: 1, Name: "商品详情", Type: "api", APIPath: "/adminapi/goods/%v", Method: "GET", Sort: 0, Status: 1},
-	// 		{ID: 3, PID: 1, Name: "商品编辑", Type: "api", APIPath: "/adminapi/goods/%v", Method: "POST", Sort: 0, Status: 1},
-	// 		{ID: 4, PID: 1, Name: "商品删除", Type: "api", APIPath: "/adminapi/goods/%v", Method: "DELETE", Sort: 0, Status: 1},
-	// 		{ID: 5, PID: 0, Name: "商品分类", Type: "menu", APIPath: "/adminapi/categorylist/%v/%v", Method: "GET", Sort: 2, Status: 1},
-	// 		{ID: 6, PID: 5, Name: "商品分类详情", Type: "api", APIPath: "/adminapi/category/%v", Method: "GET", Sort: 0, Status: 1},
-	// 		{ID: 7, PID: 5, Name: "商品分类编辑", Type: "api", APIPath: "/adminapi/category/%v", Method: "POST", Sort: 0, Status: 1},
-	// 		{ID: 8, PID: 5, Name: "商品分类删除", Type: "api", APIPath: "/adminapi/category/%v", Method: "DELETE", Sort: 0, Status: 1},
-	// 	},
-	// 	Status: 1,
-	// }
-	// global.Db.Create(&role)
+	adminUser := model.AdminUser{
+		Username: "admin",
+		Password: util.HashPassword("123456"),
+		Role: model.Role{
+			Name:   "超级管理员",
+			Tag:    "superadmin",
+			Status: 1,
+		},
+		// RoleID:   role.ID,
+		Phone:  "15215657185",
+		Status: 1,
+	}
+	global.Db.Create(&adminUser)
 
-	// goodseditor := model.AdminUser{
-	// 	Username: "goodseditor",
-	// 	Password: util.HashPassword("123456"),
-	// 	// Role: model.Role{
-	// 	// 	Model: gorm.Model{ID:2},
-	// 	// },
-	// 	RoleID: 2,
-	// 	Phone:  "13721047437",
-	// 	Status: 1,
-	// }
-	// global.Db.Create(&goodseditor)
+	role := model.Role{
+		Name: "子管理员",
+		Tag:  "goods_manager",
+		Menus: []model.Menu{
+			{ID: 1, PID: 0, Name: "主页", Icon: "md-home", Type: "menu", MenuPath: "/admin/home/", APIPath: "", Method: "", Sort: 1, Status: 1},
+			{ID: 2, PID: 1, Name: "首页统计接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/statistic", Method: "GET", Sort: 0, Status: 1},
 
-	// admin1 := new(model.AdminUser)
-	// admin1.ID = 1
-	// global.Db.Model(admin1).Update("phone", "16666666666")
+			{ID: 3, PID: 0, Name: "权限管理", Icon: "md-settings", Type: "menu", MenuPath: "/admin/setting/", APIPath: "", Method: "", Sort: 2, Status: 1},
+			{ID: 4, PID: 3, Name: "管理员", Icon: "", Type: "menu", MenuPath: "/admin/setting/admin_user", APIPath: "", Method: "", Sort: 0, Status: 1},
+			{ID: 5, PID: 4, Name: "管理员列表接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/list/%v/%v", Method: "GET", Sort: 0, Status: 1},
+			{ID: 6, PID: 4, Name: "管理员详情接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "GET", Sort: 0, Status: 1},
+			{ID: 7, PID: 4, Name: "管理员添加编辑接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser", Method: "POST", Sort: 0, Status: 1},
+			{ID: 8, PID: 4, Name: "管理员删除接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "DELETE", Sort: 0, Status: 1},
+			{ID: 9, PID: 4, Name: "管理员禁用启用接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/status/%v", Method: "GET", Sort: 0, Status: 1},
+			{ID: 10, PID: 3, Name: "角色", Icon: "", Type: "menu", MenuPath: "/admin/setting/role", APIPath: "", Method: "", Sort: 0, Status: 1},
+			{ID: 11, PID: 10, Name: "角色列表接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role/list/%v/%v", Method: "GET", Sort: 0, Status: 1},
+			{ID: 12, PID: 10, Name: "角色添加编辑接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role", Method: "POST", Sort: 0, Status: 1},
+		},
+		Status: 1,
+	}
+	global.Db.Create(&role)
+
+	goodseditor := model.AdminUser{
+		Username: "subadmin",
+		Password: util.HashPassword("123456"),
+		// Role: model.Role{
+		// 	Model: gorm.Model{ID:2},
+		// },
+		RoleID: 2,
+		Phone:  "13721047437",
+		Status: 1,
+	}
+	global.Db.Create(&goodseditor)
 
 	return "ok"
 }
 
-// AfterActivation 前置方法
+// AfterActivation 后置方法
 func (p *Public) AfterActivation(a mvc.AfterActivation) {
 	// 给单独的控制器方法添加中间件
 	// select the route based on the method name you want to modify.

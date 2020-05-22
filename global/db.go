@@ -29,6 +29,8 @@ func init() {
 	// 全局禁用表名复数
 	Db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 
+	Db.LogMode(config.DB.Debug)
+
 	Db.DB().SetMaxIdleConns(10)
 	Db.DB().SetMaxOpenConns(100)
 

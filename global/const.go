@@ -9,4 +9,7 @@ const (
 	AdminRefreshTokenMinutes = 24 * 60
 	// AdminUserCacheMinutes 管理员信息缓存时间/分钟
 	AdminUserCacheMinutes = 60
+
+	// SuperAdminUserTag 超级管理员Tag
+	SuperAdminUserTag = "superadmin"
 )

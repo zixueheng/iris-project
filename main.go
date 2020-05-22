@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	adminapimodel "iris-project/app/adminapi/model"
 	"iris-project/config"
 	"iris-project/global"
 	"iris-project/lib/file"
@@ -20,7 +19,7 @@ import (
 func main() {
 	app := NewApp()
 
-	app.Logger().SetLevel("debug")
+	app.Logger().SetLevel(config.App.LogLevel)
 
 	file := NewLogFile()
 	defer file.Close()
@@ -76,14 +75,6 @@ func NewApp() *iris.Application {
 	app.Use(recover.New()) // Recover 会从paincs中恢复并返回 500 错误码
 
 	app.HandleDir("/static", "./assets", iris.DirOptions{ShowList: true, Gzip: true})
-
-	db := global.Db
-	db.AutoMigrate(
-		// &model.User{},
-		&adminapimodel.Menu{},
-		&adminapimodel.Role{},
-		&adminapimodel.AdminUser{},
-	)
 
 	iris.RegisterOnInterrupt(func() {
 		_ = global.Db.Close()

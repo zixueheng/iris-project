@@ -13,7 +13,7 @@ const (
 	CodeCustom            Code = 999 // 自定义错误
 )
 
-// 会员相关Code
+// 账号相关Code
 const (
 	CodeUserLoginSucceed Code = iota + 1000
 	CodeUserNotFound
@@ -38,7 +38,7 @@ var codeMap = map[Code]string{
 	CodeSucceed:           "成功",
 	CodeFailed:            "失败",
 	CodeForbidden:         "禁止操作",
-	CodeNotFound:          "未找到",
+	CodeNotFound:          "未找到或不存在",
 	CodeRequestParamError: "请求参数错误",
 
 	CodeUserLoginSucceed:  "登录成功",
