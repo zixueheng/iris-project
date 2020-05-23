@@ -95,7 +95,7 @@ func checkRight(adminUser *model.AdminUser, path, method string) (hasRight bool)
 	hasRight = false
 	menus := adminUser.Role.Menus
 	for _, menu := range menus {
-		if menu.Type == "api" && menu.APIPath == path && strings.ToUpper(menu.Method) == strings.ToUpper(method) {
+		if menu.Type == "api" && menu.Status == 1 && menu.APIPath == path && strings.ToUpper(menu.Method) == strings.ToUpper(method) {
 			hasRight = true
 			return
 		}

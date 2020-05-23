@@ -3,6 +3,7 @@ package controller
 import (
 	"iris-project/app"
 	"iris-project/app/adminapi/model"
+	"iris-project/app/adminapi/validate"
 	"iris-project/global"
 
 	"github.com/kataras/iris/v12"
@@ -42,14 +43,68 @@ func (r *Role) GetRoleListBy(page, size uint) {
 	r.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", app.List{List: roles, Total: total}))
 }
 
+// GetRoleBy 角色详情
+func (r *Role) GetRoleBy(id uint) {
+	role := new(model.Role)
+	if !role.GetRoleByID(id) {
+		r.Ctx.JSON(app.APIData(false, app.CodeNotFound, "", nil))
+		return
+	}
+	r.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", role))
+}
+
 // PostRole 创建或更新角色
 func (r *Role) PostRole() {
+	postInfo := new(validate.RoleRequest)
 
+	errmsg := app.CheckRequest(r.Ctx, postInfo)
+	if len(errmsg) != 0 {
+		r.Ctx.JSON(app.APIData(false, app.CodeCustom, errmsg, nil))
+		return
+	}
+	role := &model.Role{
+		ID:     postInfo.ID,
+		Name:   postInfo.Name,
+		Tag:    postInfo.Tag,
+		Status: postInfo.Status,
+	}
+	menus := make([]model.Menu, 0)
+	for _, mid := range postInfo.MenuIds {
+		menu := new(model.Menu)
+		if menu.GetMenuByID(mid) {
+			menus = append(menus, *menu)
+		} else {
+			r.Ctx.JSON(app.APIData(false, app.CodeRequestParamError, "", nil))
+			return
+		}
+	}
+	role.Menus = menus
+
+	if err := role.CreateUpdateRole(); err != nil {
+		r.Ctx.JSON(app.APIData(false, app.CodeCustom, err.Error(), nil))
+		return
+	}
+
+	r.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
 // DeleteRoleBy 删除角色
 func (r *Role) DeleteRoleBy(id uint) {
+	role := new(model.Role)
+	if !role.GetRoleByID(id) {
+		r.Ctx.JSON(app.APIData(false, app.CodeNotFound, "", nil))
+		return
+	}
 
+	if role.Tag == global.SuperAdminUserTag { // 超级管理员禁止删除
+		r.Ctx.JSON(app.APIData(false, app.CodeForbidden, "", nil))
+		return
+	}
+	if global.Db.Unscoped().Delete(role).RowsAffected > 0 {
+		r.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
+		return
+	}
+	r.Ctx.JSON(app.APIData(false, app.CodeFailed, "", nil))
 }
 
 // GetRoleStatusBy 禁用或启用角色

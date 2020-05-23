@@ -24,7 +24,7 @@ func (m *Menu) BeforeActivation(b mvc.BeforeActivation) {
 // GetMenuTree 所有的菜单转成树状结构，一次返回
 func (m *Menu) GetMenuTree() {
 	menu := &model.Menu{}
-	tree := menu.GetTreeMenus()
+	tree := menu.GetTreeMenus(make([]model.Menu, 0))
 	m.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", tree))
 }
 

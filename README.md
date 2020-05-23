@@ -59,40 +59,38 @@ Iris MVC + Gorm + MySQL + Redis
         "list": [
             {
                 "id": 1,
-                "created_at": "2020-05-20 11:35:29",
-                "updated_at": "2020-05-20 11:40:47",
+                "created_at": "2020-05-23 09:29:08",
+                "updated_at": "2020-05-23 09:29:08",
                 "username": "admin",
                 "role_id": 1,
                 "role": {
                     "id": 1,
-                    "created_at": "2020-05-20 11:35:29",
+                    "created_at": "2020-05-23 09:29:08",
                     "name": "超级管理员",
                     "tag": "superadmin",
-                    "menus": null,
                     "status": 1
                 },
-                "phone": "16666666666",
+                "phone": "15215657185",
                 "status": 1
             },
             {
                 "id": 2,
-                "created_at": "2020-05-20 11:35:29",
-                "updated_at": "2020-05-20 11:35:29",
-                "username": "goodseditor",
+                "created_at": "2020-05-23 09:29:09",
+                "updated_at": "2020-05-23 09:29:09",
+                "username": "subadmin",
                 "role_id": 2,
                 "role": {
                     "id": 2,
-                    "created_at": "2020-05-20 11:35:29",
-                    "name": "商品管理员",
+                    "created_at": "2020-05-23 09:29:09",
+                    "name": "子管理员",
                     "tag": "goods_manager",
-                    "menus": null,
                     "status": 1
                 },
                 "phone": "13721047437",
                 "status": 1
             }
         ],
-        "total": 13 // 总共多少条
+        "total": 2
     }
 }
 ```
@@ -100,7 +98,7 @@ Iris MVC + Gorm + MySQL + Redis
 
 ### 管理员详情
 - Request:
-- URL: http://localhost:8080/adminapi/adminuser/2 (2是id)
+- URL: http://localhost:8080/adminapi/adminuser/2 (2是id，如果是超级管理员不加载菜单树，超级管理员拥有所有菜单权限)
 - Method: Get
 - Header: authorization: bearer token(登录获取的token)
 - Response:
@@ -111,103 +109,187 @@ Iris MVC + Gorm + MySQL + Redis
     "msg": "成功",
     "data": {
         "id": 2,
-        "created_at": "2020-05-20 11:35:29",
-        "updated_at": "2020-05-20 11:35:29",
-        "username": "goodseditor",
+        "created_at": "2020-05-23 09:29:09",
+        "updated_at": "2020-05-23 09:29:09",
+        "username": "subadmin",
         "role_id": 2,
         "role": {
             "id": 2,
-            "created_at": "2020-05-20 11:35:29",
-            "name": "商品管理员",
+            "created_at": "2020-05-23 09:29:09",
+            "name": "子管理员",
             "tag": "goods_manager",
-            "menus": [
+            "menus_tree": [
                 {
                     "id": 1,
-                    "created_at": "2020-05-20 11:35:29",
+                    "created_at": "2020-05-23 09:29:09",
                     "p_id": 0,
-                    "name": "商品列表",
+                    "name": "主页",
+                    "icon": "md-home",
                     "type": "menu",
-                    "api_path": "/adminapi/goodslist/%v/%v",
-                    "method": "GET",
+                    "menu_path": "/admin/home/",
+                    "api_path": "",
+                    "method": "",
                     "sort": 1,
-                    "status": 1
-                },
-                {
-                    "id": 2,
-                    "created_at": "2020-05-20 11:35:29",
-                    "p_id": 1,
-                    "name": "商品详情",
-                    "type": "api",
-                    "api_path": "/adminapi/goods/%v",
-                    "method": "GET",
-                    "sort": 0,
-                    "status": 1
+                    "status": 1,
+                    "children": [
+                        {
+                            "id": 2,
+                            "created_at": "2020-05-23 09:29:09",
+                            "p_id": 1,
+                            "name": "首页统计接口",
+                            "icon": "",
+                            "type": "api",
+                            "menu_path": "",
+                            "api_path": "/adminapi/statistic",
+                            "method": "GET",
+                            "sort": 0,
+                            "status": 1,
+                            "children": []
+                        }
+                    ]
                 },
                 {
                     "id": 3,
-                    "created_at": "2020-05-20 11:35:29",
-                    "p_id": 1,
-                    "name": "商品编辑",
-                    "type": "api",
-                    "api_path": "/adminapi/goods/%v",
-                    "method": "POST",
-                    "sort": 0,
-                    "status": 1
-                },
-                {
-                    "id": 4,
-                    "created_at": "2020-05-20 11:35:29",
-                    "p_id": 1,
-                    "name": "商品删除",
-                    "type": "api",
-                    "api_path": "/adminapi/goods/%v",
-                    "method": "DELETE",
-                    "sort": 0,
-                    "status": 1
-                },
-                {
-                    "id": 5,
-                    "created_at": "2020-05-20 11:35:29",
+                    "created_at": "2020-05-23 09:29:09",
                     "p_id": 0,
-                    "name": "商品分类",
+                    "name": "权限管理",
+                    "icon": "md-settings",
                     "type": "menu",
-                    "api_path": "/adminapi/categorylist/%v/%v",
-                    "method": "GET",
+                    "menu_path": "/admin/setting/",
+                    "api_path": "",
+                    "method": "",
                     "sort": 2,
-                    "status": 1
-                },
-                {
-                    "id": 6,
-                    "created_at": "2020-05-20 11:35:29",
-                    "p_id": 5,
-                    "name": "商品分类详情",
-                    "type": "api",
-                    "api_path": "/adminapi/category/%v",
-                    "method": "GET",
-                    "sort": 0,
-                    "status": 1
-                },
-                {
-                    "id": 7,
-                    "created_at": "2020-05-20 11:35:29",
-                    "p_id": 5,
-                    "name": "商品分类编辑",
-                    "type": "api",
-                    "api_path": "/adminapi/category/%v",
-                    "method": "POST",
-                    "sort": 0,
-                    "status": 1
-                },
-                {
-                    "id": 8,
-                    "created_at": "2020-05-20 11:35:29",
-                    "p_id": 5,
-                    "name": "商品分类删除",
-                    "type": "api",
-                    "api_path": "/adminapi/category/%v",
-                    "method": "DELETE",
-                    "sort": 0,
-                    "status": 1
+                    "status": 1,
+                    "children": [
+                        {
+                            "id": 4,
+                            "created_at": "2020-05-23 09:29:09",
+                            "p_id": 3,
+                            "name": "管理员",
+                            "icon": "",
+                            "type": "menu",
+                            "menu_path": "/admin/setting/admin_user",
+                            "api_path": "",
+                            "method": "",
+                            "sort": 0,
+                            "status": 1,
+                            "children": [
+                                {
+                                    "id": 5,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 4,
+                                    "name": "管理员列表接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/adminuser/list/%v/%v",
+                                    "method": "GET",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                },
+                                {
+                                    "id": 6,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 4,
+                                    "name": "管理员详情接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/adminuser/%v",
+                                    "method": "GET",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                },
+                                {
+                                    "id": 7,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 4,
+                                    "name": "管理员添加编辑接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/adminuser",
+                                    "method": "POST",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                },
+                                {
+                                    "id": 8,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 4,
+                                    "name": "管理员删除接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/adminuser/%v",
+                                    "method": "DELETE",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                },
+                                {
+                                    "id": 9,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 4,
+                                    "name": "管理员禁用启用接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/adminuser/status/%v",
+                                    "method": "GET",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": 10,
+                            "created_at": "2020-05-23 09:29:09",
+                            "p_id": 3,
+                            "name": "角色",
+                            "icon": "",
+                            "type": "menu",
+                            "menu_path": "/admin/setting/role",
+                            "api_path": "",
+                            "method": "",
+                            "sort": 0,
+                            "status": 1,
+                            "children": [
+                                {
+                                    "id": 11,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 10,
+                                    "name": "角色列表接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/role/list/%v/%v",
+                                    "method": "GET",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                },
+                                {
+                                    "id": 12,
+                                    "created_at": "2020-05-23 09:29:09",
+                                    "p_id": 10,
+                                    "name": "角色添加编辑接口",
+                                    "icon": "",
+                                    "type": "api",
+                                    "menu_path": "",
+                                    "api_path": "/adminapi/role",
+                                    "method": "POST",
+                                    "sort": 0,
+                                    "status": 1,
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "status": 1
@@ -252,7 +334,7 @@ Iris MVC + Gorm + MySQL + Redis
 ### 禁用或启用管理员
 - Request:
 - URL: http://localhost:8080/adminapi/adminuser/status/2 (2是id，访问一次状态就修改成相反的)
-- Method: Delete
+- Method: Get
 - Header: authorization: bearer token(登录获取的token)
 - Response:
 ```json
@@ -280,7 +362,7 @@ Iris MVC + Gorm + MySQL + Redis
     "data": [
         {
             "id": 1,
-            "created_at": "2020-05-21 17:05:28",
+            "created_at": "2020-05-23 09:29:09",
             "p_id": 0,
             "name": "主页",
             "icon": "md-home",
@@ -293,7 +375,7 @@ Iris MVC + Gorm + MySQL + Redis
             "children": [
                 {
                     "id": 2,
-                    "created_at": "2020-05-21 17:05:28",
+                    "created_at": "2020-05-23 09:29:09",
                     "p_id": 1,
                     "name": "首页统计接口",
                     "icon": "",
@@ -303,15 +385,15 @@ Iris MVC + Gorm + MySQL + Redis
                     "method": "GET",
                     "sort": 0,
                     "status": 1,
-                    "children": null
+                    "children": []
                 }
             ]
         },
         {
             "id": 3,
-            "created_at": "2020-05-21 17:05:28",
+            "created_at": "2020-05-23 09:29:09",
             "p_id": 0,
-            "name": "管理权限",
+            "name": "权限管理",
             "icon": "md-settings",
             "type": "menu",
             "menu_path": "/admin/setting/",
@@ -322,7 +404,7 @@ Iris MVC + Gorm + MySQL + Redis
             "children": [
                 {
                     "id": 4,
-                    "created_at": "2020-05-21 17:05:28",
+                    "created_at": "2020-05-23 09:29:09",
                     "p_id": 3,
                     "name": "管理员",
                     "icon": "",
@@ -335,7 +417,7 @@ Iris MVC + Gorm + MySQL + Redis
                     "children": [
                         {
                             "id": 5,
-                            "created_at": "2020-05-21 17:05:28",
+                            "created_at": "2020-05-23 09:29:09",
                             "p_id": 4,
                             "name": "管理员列表接口",
                             "icon": "",
@@ -345,11 +427,11 @@ Iris MVC + Gorm + MySQL + Redis
                             "method": "GET",
                             "sort": 0,
                             "status": 1,
-                            "children": null
+                            "children": []
                         },
                         {
                             "id": 6,
-                            "created_at": "2020-05-21 17:05:28",
+                            "created_at": "2020-05-23 09:29:09",
                             "p_id": 4,
                             "name": "管理员详情接口",
                             "icon": "",
@@ -359,11 +441,11 @@ Iris MVC + Gorm + MySQL + Redis
                             "method": "GET",
                             "sort": 0,
                             "status": 1,
-                            "children": null
+                            "children": []
                         },
                         {
                             "id": 7,
-                            "created_at": "2020-05-21 17:05:28",
+                            "created_at": "2020-05-23 09:29:09",
                             "p_id": 4,
                             "name": "管理员添加编辑接口",
                             "icon": "",
@@ -373,11 +455,11 @@ Iris MVC + Gorm + MySQL + Redis
                             "method": "POST",
                             "sort": 0,
                             "status": 1,
-                            "children": null
+                            "children": []
                         },
                         {
                             "id": 8,
-                            "created_at": "2020-05-21 17:05:28",
+                            "created_at": "2020-05-23 09:29:09",
                             "p_id": 4,
                             "name": "管理员删除接口",
                             "icon": "",
@@ -387,11 +469,11 @@ Iris MVC + Gorm + MySQL + Redis
                             "method": "DELETE",
                             "sort": 0,
                             "status": 1,
-                            "children": null
+                            "children": []
                         },
                         {
                             "id": 9,
-                            "created_at": "2020-05-21 17:05:28",
+                            "created_at": "2020-05-23 09:29:09",
                             "p_id": 4,
                             "name": "管理员禁用启用接口",
                             "icon": "",
@@ -401,13 +483,13 @@ Iris MVC + Gorm + MySQL + Redis
                             "method": "GET",
                             "sort": 0,
                             "status": 1,
-                            "children": null
+                            "children": []
                         }
                     ]
                 },
                 {
                     "id": 10,
-                    "created_at": "2020-05-21 17:05:28",
+                    "created_at": "2020-05-23 09:29:09",
                     "p_id": 3,
                     "name": "角色",
                     "icon": "",
@@ -420,7 +502,7 @@ Iris MVC + Gorm + MySQL + Redis
                     "children": [
                         {
                             "id": 11,
-                            "created_at": "2020-05-21 17:05:28",
+                            "created_at": "2020-05-23 09:29:09",
                             "p_id": 10,
                             "name": "角色列表接口",
                             "icon": "",
@@ -430,7 +512,21 @@ Iris MVC + Gorm + MySQL + Redis
                             "method": "GET",
                             "sort": 0,
                             "status": 1,
-                            "children": null
+                            "children": []
+                        },
+                        {
+                            "id": 12,
+                            "created_at": "2020-05-23 09:29:09",
+                            "p_id": 10,
+                            "name": "角色添加编辑接口",
+                            "icon": "",
+                            "type": "api",
+                            "menu_path": "",
+                            "api_path": "/adminapi/role",
+                            "method": "POST",
+                            "sort": 0,
+                            "status": 1,
+                            "children": []
                         }
                     ]
                 }
@@ -474,7 +570,7 @@ Iris MVC + Gorm + MySQL + Redis
 ### 禁用或启用菜单
 - Request:
 - URL: http://localhost:8080/adminapi/menu/status/3 (3是菜单ID)
-- Method: Delete
+- Method: Get
 - Header: authorization: bearer token(登录获取的token)
 - Response:
 ```json
@@ -503,14 +599,262 @@ Iris MVC + Gorm + MySQL + Redis
         "list": [
             {
                 "id": 1,
-                "created_at": "2020-05-22 17:11:37",
+                "created_at": "2020-05-23 09:29:08",
                 "name": "超级管理员",
                 "tag": "superadmin",
-                "menus": null, // 此处菜单未加载
+                "status": 1
+            },
+            {
+                "id": 2,
+                "created_at": "2020-05-23 09:29:09",
+                "name": "子管理员",
+                "tag": "goods_manager",
                 "status": 1
             }
         ],
-        "total": 1 // 总数
+        "total": 2
     }
+}
+```
+
+### 角色详情
+- Request:
+- URL: http://localhost:8080/adminapi/role/2 (超级管理员角色不加载菜单树)
+- Method: Get
+- Header: authorization: bearer token(登录获取的token)
+- Response:
+```json
+{
+    "success": true,
+    "code": 200,
+    "msg": "成功",
+    "data": {
+        "id": 2,
+        "created_at": "2020-05-23 09:29:09",
+        "name": "子管理员",
+        "tag": "goods_manager",
+        "menus_tree": [
+            {
+                "id": 1,
+                "created_at": "2020-05-23 09:29:09",
+                "p_id": 0,
+                "name": "主页",
+                "icon": "md-home",
+                "type": "menu",
+                "menu_path": "/admin/home/",
+                "api_path": "",
+                "method": "",
+                "sort": 1,
+                "status": 1,
+                "children": [
+                    {
+                        "id": 2,
+                        "created_at": "2020-05-23 09:29:09",
+                        "p_id": 1,
+                        "name": "首页统计接口",
+                        "icon": "",
+                        "type": "api",
+                        "menu_path": "",
+                        "api_path": "/adminapi/statistic",
+                        "method": "GET",
+                        "sort": 0,
+                        "status": 1,
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "created_at": "2020-05-23 09:29:09",
+                "p_id": 0,
+                "name": "权限管理",
+                "icon": "md-settings",
+                "type": "menu",
+                "menu_path": "/admin/setting/",
+                "api_path": "",
+                "method": "",
+                "sort": 2,
+                "status": 1,
+                "children": [
+                    {
+                        "id": 4,
+                        "created_at": "2020-05-23 09:29:09",
+                        "p_id": 3,
+                        "name": "管理员",
+                        "icon": "",
+                        "type": "menu",
+                        "menu_path": "/admin/setting/admin_user",
+                        "api_path": "",
+                        "method": "",
+                        "sort": 0,
+                        "status": 1,
+                        "children": [
+                            {
+                                "id": 5,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 4,
+                                "name": "管理员列表接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/adminuser/list/%v/%v",
+                                "method": "GET",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            },
+                            {
+                                "id": 6,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 4,
+                                "name": "管理员详情接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/adminuser/%v",
+                                "method": "GET",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            },
+                            {
+                                "id": 7,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 4,
+                                "name": "管理员添加编辑接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/adminuser",
+                                "method": "POST",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            },
+                            {
+                                "id": 8,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 4,
+                                "name": "管理员删除接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/adminuser/%v",
+                                "method": "DELETE",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            },
+                            {
+                                "id": 9,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 4,
+                                "name": "管理员禁用启用接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/adminuser/status/%v",
+                                "method": "GET",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "id": 10,
+                        "created_at": "2020-05-23 09:29:09",
+                        "p_id": 3,
+                        "name": "角色",
+                        "icon": "",
+                        "type": "menu",
+                        "menu_path": "/admin/setting/role",
+                        "api_path": "",
+                        "method": "",
+                        "sort": 0,
+                        "status": 1,
+                        "children": [
+                            {
+                                "id": 11,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 10,
+                                "name": "角色列表接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/role/list/%v/%v",
+                                "method": "GET",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            },
+                            {
+                                "id": 12,
+                                "created_at": "2020-05-23 09:29:09",
+                                "p_id": 10,
+                                "name": "角色添加编辑接口",
+                                "icon": "",
+                                "type": "api",
+                                "menu_path": "",
+                                "api_path": "/adminapi/role",
+                                "method": "POST",
+                                "sort": 0,
+                                "status": 1,
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "status": 1
+    }
+}
+```
+
+
+### 角色创建或更新
+- Request:
+- URL: http://localhost:8080/adminapi/role
+- Method: Post
+- Header: authorization: bearer token(登录获取的token)
+- Body: `{"id":3,"name":"信息管理员","tag":"editor","status":1,"menu_ids":[3,10,11,12]}` (json里面有`id`字段就是编辑、没有就是新增，menu_ids要确保从1级菜单往下衍生)
+- Response:
+```json
+{
+    "success": true,
+    "code": 200,
+    "msg": "成功",
+    "data": null
+}
+```
+
+### 角色删除
+- Request:
+- URL: http://localhost:8080/adminapi/role/3
+- Method: Delete
+- Header: authorization: bearer token(登录获取的token)
+- Response:
+```json
+{
+    "success": true,
+    "code": 200,
+    "msg": "成功",
+    "data": null
+}
+```
+
+### 角色禁用或启用
+- Request:
+- URL: http://localhost:8080/adminapi/role/status/2
+- Method: Get
+- Header: authorization: bearer token(登录获取的token)
+- Response:
+```json
+{
+    "success": true,
+    "code": 200,
+    "msg": "成功",
+    "data": null
 }
 ```

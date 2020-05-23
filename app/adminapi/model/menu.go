@@ -51,9 +51,12 @@ func (m *Menu) CreateUpdateMenu() error {
 }
 
 // GetTreeMenus 获取树状菜单
-func (m *Menu) GetTreeMenus() []*MenuTree {
-	var allMenus []Menu
-	global.Db.Find(&allMenus)
+//
+// 如果参数 allMenus 不为空，则肯定包含1级菜单（即PID=0的项目）（每个角色的菜单权限是从1级菜单往下衍生的）
+func (m *Menu) GetTreeMenus(allMenus []Menu) []*MenuTree {
+	if allMenus == nil || len(allMenus) == 0 { // 不传入角色的菜单权限，则加载全部菜单权限
+		global.Db.Find(&allMenus)
+	}
 
 	var allMenuTree []*MenuTree
 
@@ -77,6 +80,8 @@ func makeTree(list []*MenuTree, menuTree *MenuTree) {
 		for _, v := range children {
 			makeTree(list, v)
 		}
+	} else {
+		menuTree.Children = make([]*MenuTree, 0) // 没有子节点将 nil 转成空切片，输出json 是[] 而不是 null
 	}
 }
 
