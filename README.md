@@ -1,5 +1,5 @@
-# Iris project
-Iris MVC + Gorm + MySQL + Redis
+# Iris project 后台登录菜单权限角色管理
+Iris MVC 多模块设计 + Gorm + MySQL + Redis
 
 # API
 
