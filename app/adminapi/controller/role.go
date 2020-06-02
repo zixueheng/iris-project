@@ -46,7 +46,7 @@ func (r *Role) GetRoleListBy(page, size uint) {
 // GetRoleBy 角色详情
 func (r *Role) GetRoleBy(id uint) {
 	role := new(model.Role)
-	if !role.GetRoleByID(id) {
+	if !role.GetRoleMenusTreeByID(id) {
 		r.Ctx.JSON(app.APIData(false, app.CodeNotFound, "", nil))
 		return
 	}
@@ -68,11 +68,11 @@ func (r *Role) PostRole() {
 		Tag:    postInfo.Tag,
 		Status: postInfo.Status,
 	}
-	menus := make([]model.Menu, 0)
+	menus := make([]*model.Menu, 0)
 	for _, mid := range postInfo.MenuIds {
 		menu := new(model.Menu)
 		if menu.GetMenuByID(mid) {
-			menus = append(menus, *menu)
+			menus = append(menus, menu)
 		} else {
 			r.Ctx.JSON(app.APIData(false, app.CodeRequestParamError, "", nil))
 			return

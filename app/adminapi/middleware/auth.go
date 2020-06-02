@@ -57,27 +57,25 @@ func Auth(ctx iris.Context) {
 			return
 		}
 
-		var role = new(model.Role)
-		if role.GetRoleByID(adminUser.RoleID) { // 加载角色包括角色的菜单
-			adminUser.Role = *role
-			json, _ := json.Marshal(adminUser)
-			global.Redis.Set("vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
-
-			if adminUser.Role.Tag != global.SuperAdminUserTag { // 不是超级管理员 检查权限
-				if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {
-					ctx.JSON(app.APIData(false, app.CodeNotAllowed, "", nil))
-					ctx.StopExecution()
-					return
-				}
-			}
-		} else { // 账号没有关联角色，即没有权限
+		if len(adminUser.Roles) == 0 { // 账号没有关联角色，即没有权限
 			ctx.JSON(app.APIData(false, app.CodeNotAllowed, "", nil))
 			ctx.StopExecution()
 			return
 		}
+		json, _ := json.Marshal(adminUser)
+		global.Redis.Set("vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
+
+		if !adminUser.SuperAdmin { // 不是超级管理员 检查权限
+			if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {
+				ctx.JSON(app.APIData(false, app.CodeNotAllowed, "", nil))
+				ctx.StopExecution()
+				return
+			}
+		}
+
 	} else {
 		json.Unmarshal([]byte(cacheAdminUser), adminUser)
-		if adminUser.Role.Tag != global.SuperAdminUserTag { // 不是超级管理员 检查权限
+		if !adminUser.SuperAdmin { // 不是超级管理员 检查权限
 			if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {
 				ctx.JSON(app.APIData(false, app.CodeNotAllowed, "", nil))
 				ctx.StopExecution()
@@ -93,7 +91,7 @@ func Auth(ctx iris.Context) {
 func checkRight(adminUser *model.AdminUser, path, method string) (hasRight bool) {
 	// fmt.Println("检查权限：", adminUser.Username, path, method)
 	hasRight = false
-	menus := adminUser.Role.Menus
+	menus := adminUser.Menus
 	for _, menu := range menus {
 		if menu.Type == "api" && menu.Status == 1 && menu.APIPath == path && strings.ToUpper(menu.Method) == strings.ToUpper(method) {
 			hasRight = true

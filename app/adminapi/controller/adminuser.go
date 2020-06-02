@@ -39,25 +39,26 @@ func (au *AdminUser) GetAdminuserListBy(page, size uint) {
 		adminUsers []model.AdminUser
 		total      uint
 	)
-	global.Db.Where(where).Preload("Role").Offset((page - 1) * size).Limit(size).Find(&adminUsers).Offset(-1).Limit(-1).Count(&total)
+	global.Db.Where(where).Preload("Roles").Offset((page - 1) * size).Limit(size).Find(&adminUsers).Offset(-1).Limit(-1).Count(&total)
+	for i, adminUser := range adminUsers {
+		for _, role := range adminUser.Roles {
+			if role.Tag == global.SuperAdminUserTag {
+				adminUsers[i].SuperAdmin = true
+			}
+		}
+	}
 
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", app.List{List: adminUsers, Total: total}))
 }
 
 // GetAdminuserBy 获取管理员详情
 func (au *AdminUser) GetAdminuserBy(id uint) {
-	var (
-		adminUser = new(model.AdminUser)
-		role      = new(model.Role)
-	)
+	adminUser := new(model.AdminUser)
 	if !adminUser.GetAdminUserByID(id) {
 		au.Ctx.JSON(app.APIData(true, app.CodeUserNotFound, "", nil))
 		return
 	}
 
-	if role.GetRoleByID(adminUser.RoleID) {
-		adminUser.Role = *role
-	}
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", *adminUser))
 }
 
@@ -74,10 +75,21 @@ func (au *AdminUser) PostAdminuser() {
 	adminUser := &model.AdminUser{
 		ID:       postInfo.ID,
 		Username: postInfo.Username,
-		RoleID:   postInfo.RoleID,
 		Phone:    postInfo.Phone,
 		Status:   postInfo.Status,
 	}
+	roles := make([]model.Role, 0)
+	for _, rid := range postInfo.RoleIds {
+		role := new(model.Role)
+		role.GetRoleByID(rid)
+		if role.Tag == global.SuperAdminUserTag && len(postInfo.RoleIds) > 1 {
+			au.Ctx.JSON(app.APIData(false, app.CodeCustom, "超级管理员不可同时拥有其他角色", nil))
+			return
+		}
+		roles = append(roles, *role)
+	}
+	adminUser.Roles = roles
+
 	if postInfo.Password != "" {
 		adminUser.Password = util.HashPassword(postInfo.Password)
 	}
@@ -97,8 +109,8 @@ func (au *AdminUser) DeleteAdminuserBy(id uint) {
 		au.Ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil))
 		return
 	}
-	role := new(model.Role)
-	if role.GetRoleByID(adminUser.RoleID) && role.Tag == global.SuperAdminUserTag { // 超级管理员禁止删除
+
+	if adminUser.SuperAdmin { // 超级管理员禁止删除
 		au.Ctx.JSON(app.APIData(false, app.CodeForbidden, "", nil))
 		return
 	}
@@ -116,8 +128,8 @@ func (au *AdminUser) GetAdminuserStatusBy(id uint) {
 		au.Ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil))
 		return
 	}
-	var role = new(model.Role)
-	if role.GetRoleByID(adminUser.RoleID) && role.Tag == global.SuperAdminUserTag {
+
+	if adminUser.SuperAdmin {
 		au.Ctx.JSON(app.APIData(false, app.CodeForbidden, "", nil))
 		return
 	}

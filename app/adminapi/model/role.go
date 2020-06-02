@@ -14,20 +14,33 @@ type Role struct {
 	CreatedAt global.SQLTime `gorm:"type:datetime;" json:"created_at"`
 	Name      string         `gorm:"type:varchar(50);not null" json:"name"`
 	Tag       string         `gorm:"type:varchar(50);unique" json:"tag"`
-	Menus     []Menu         `gorm:"many2many:role_menu;" json:"-"`
+	Menus     []*Menu        `gorm:"many2many:role_menu;association_autoupdate:false" json:"-"`
 	MenusTree []*MenuTree    `gorm:"-" json:"menus_tree,omitempty"`
 	Status    int8           `gorm:"type:tinyint(1);default:1" json:"status"`
 }
 
-// GetRoleByID 根据ID获取角色（包含菜单数）
+// GetRoleByID 根据ID获取角色（不包含菜单）
 func (r *Role) GetRoleByID(id uint) bool {
+	if err := global.Db.Where("id=?", id).First(r).Error; gorm.IsRecordNotFoundError(err) {
+		return false
+	}
+	return true
+}
+
+// GetRoleMenusByID 根据ID获取角色（包含菜单）
+func (r *Role) GetRoleMenusByID(id uint) bool {
 	if err := global.Db.Where("id=?", id).Preload("Menus").First(r).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
-	if r.Tag != global.SuperAdminUserTag { // 非超级管理员需要加载菜单树
-		menu := new(Menu)
-		r.MenusTree = menu.GetTreeMenus(r.Menus)
+	return true
+}
+
+// GetRoleMenusTreeByID 根据ID获取角色（包含菜单和菜单数）
+func (r *Role) GetRoleMenusTreeByID(id uint) bool {
+	if err := global.Db.Where("id=?", id).Preload("Menus").First(r).Error; gorm.IsRecordNotFoundError(err) {
+		return false
 	}
+	r.MenusTree = GetTreeMenus(r.Menus)
 	return true
 }
 

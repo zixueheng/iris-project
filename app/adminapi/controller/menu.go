@@ -23,8 +23,7 @@ func (m *Menu) BeforeActivation(b mvc.BeforeActivation) {
 
 // GetMenuTree 所有的菜单转成树状结构，一次返回
 func (m *Menu) GetMenuTree() {
-	menu := &model.Menu{}
-	tree := menu.GetTreeMenus(make([]model.Menu, 0))
+	tree := model.GetTreeMenus(nil)
 	m.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", tree))
 }
 
@@ -39,16 +38,17 @@ func (m *Menu) PostMenu() {
 	}
 
 	menu := &model.Menu{
-		ID:       postInfo.ID,
-		PID:      postInfo.PID,
-		Name:     postInfo.Name,
-		Icon:     postInfo.Icon,
-		Type:     postInfo.Type,
-		MenuPath: postInfo.MenuPath,
-		APIPath:  postInfo.APIPath,
-		Method:   postInfo.Method,
-		Sort:     postInfo.Sort,
-		Status:   postInfo.Status,
+		ID:            postInfo.ID,
+		PID:           postInfo.PID,
+		Name:          postInfo.Name,
+		Icon:          postInfo.Icon,
+		Type:          postInfo.Type,
+		MenuPath:      postInfo.MenuPath,
+		APIPath:       postInfo.APIPath,
+		Method:        postInfo.Method,
+		UniqueAuthKey: postInfo.UniqueAuthKey,
+		Sort:          postInfo.Sort,
+		Status:        postInfo.Status,
 	}
 
 	if err := menu.CreateUpdateMenu(); err != nil {

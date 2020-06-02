@@ -1,10 +1,13 @@
 package model
 
 import (
+	"encoding/json"
 	"errors"
 	"iris-project/app"
 	"iris-project/app/adminapi/validate"
 	"iris-project/global"
+	"iris-project/lib/util"
+	"time"
 
 	"github.com/jameskeane/bcrypt"
 	"github.com/jinzhu/gorm"
@@ -21,10 +24,15 @@ type AdminUser struct {
 	UpdatedAt global.SQLTime `gorm:"type:datetime;" json:"updated_at"`
 	Username  string         `gorm:"type:varchar(100);unique_index;not null" json:"username"`
 	Password  string         `gorm:"type:varchar(100);not null" json:"-"`
-	RoleID    uint           `json:"role_id"`
-	Role      Role           `json:"role"`
-	Phone     string         `gorm:"type:char(11);not null" json:"phone"`
-	Status    int8           `gorm:"type:tinyint(1);default:1" json:"status"`
+	// RoleID    uint           `json:"role_id"`
+	// Role      Role           `json:"role"`
+	Roles          []Role      `gorm:"many2many:admin_user_role;association_autoupdate:false;" json:"roles"`
+	SuperAdmin     bool        `gorm:"-" json:"super_admin"`      // 是否超级管理员
+	Menus          []*Menu     `gorm:"-" json:"menus"`            // 所有菜单
+	MenusTree      []*MenuTree `gorm:"-" json:"menus_tree"`       // 菜单树
+	UniqueAuthKeys []string    `gorm:"-" json:"unique_auth_keys"` // 所有鉴权key
+	Phone          string      `gorm:"type:char(11);not null" json:"phone"`
+	Status         int8        `gorm:"type:tinyint(1);default:1" json:"status"`
 }
 
 // CheckLogin 登录检查
@@ -36,12 +44,19 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 	} else {
 		if bcrypt.Match(loginInfo.Password, au.Password) {
 			token, refreshToken := app.GenTokenAndRefreshToken("admin_user_id", int(au.ID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
+			au.GetAdminUserByID(au.ID)
+
+			json, _ := json.Marshal(au)
+			global.Redis.Set("vo_admin_user_"+util.ParseString(int(au.ID)), string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
+
 			response := struct {
 				Token        string `json:"token"`
 				RefreshToken string `json:"refresh_token"`
+				AdminUser    `json:"admin_user"`
 			}{
 				Token:        token,
 				RefreshToken: refreshToken,
+				AdminUser:    *au,
 			}
 
 			return response, true, app.CodeUserLoginSucceed
@@ -52,13 +67,51 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 
 }
 
-// GetAdminUserByID 根据ID获取管理员
+// GetAdminUserByID 根据ID获取管理员（包括角色、菜单、菜单树）
 func (au *AdminUser) GetAdminUserByID(id uint) bool {
-	if err := global.Db.Where("id=?", id).First(au).Error; gorm.IsRecordNotFoundError(err) {
+	if err := global.Db.Where("id=?", id).Preload("Roles", "status=?", 1).First(au).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
+
+	for _, role := range au.Roles {
+		if role.Tag == global.SuperAdminUserTag {
+			au.SuperAdmin = true
+			menus := make([]*Menu, 0)
+			global.Db.Where("status=?", 1).Find(&menus) // 所有菜单
+			role.Menus = menus
+		} else {
+			role.GetRoleMenusByID(role.ID) // 加载角色菜单
+		}
+
+		for _, menu := range role.Menus {
+			if !checkMenus(au.Menus, *menu) {
+				au.Menus = append(au.Menus, menu)
+			}
+			if len(menu.UniqueAuthKey) > 0 && !checkUniqueAuthKeys(au.UniqueAuthKeys, menu.UniqueAuthKey) {
+				au.UniqueAuthKeys = append(au.UniqueAuthKeys, menu.UniqueAuthKey)
+			}
+		}
+	}
+	au.MenusTree = GetTreeMenus(au.Menus)
 	return true
 	// return FindOne(au, map[string]interface{}{"username": username}, "Role")
+}
+
+func checkMenus(menus []*Menu, menu Menu) bool {
+	for _, m := range menus {
+		if m.ID == menu.ID {
+			return true
+		}
+	}
+	return false
+}
+func checkUniqueAuthKeys(keys []string, key string) bool {
+	for _, s := range keys {
+		if s == key {
+			return true
+		}
+	}
+	return false
 }
 
 // GetAdminUserByUsername 根据用户名获取管理员
@@ -87,10 +140,12 @@ func (au *AdminUser) CreateUpdateAdminUser() error {
 		if count > 0 {
 			return errors.New("Username重复")
 		}
-		var role = new(Role)
-		if role.GetRoleByID(au.RoleID) && role.Tag == global.SuperAdminUserTag {
-			return errors.New("超级管理员禁止编辑")
-		}
+		// Todo
+		// var role = new(Role)
+		// if role.GetRoleByID(au.RoleID) && role.Tag == global.SuperAdminUserTag {
+		// 	return errors.New("超级管理员禁止编辑")
+		// }
+		global.Db.Unscoped().Where("admin_user_id=?", au.ID).Delete(&AdminUserRole{}) // 删除原来的关联
 		if err := global.Db.Model(au).Updates(*au).Error; err != nil {
 			return err
 		}
