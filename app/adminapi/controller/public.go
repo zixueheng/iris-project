@@ -96,6 +96,7 @@ func (p *Public) GetInit() string {
 	return "ok"
 }
 
+// GetInit2 初始化数据
 func (p *Public) GetInit2() string {
 	menus := []*model.Menu{
 		{ID: 1, PID: 0, Name: "主页", Icon: "md-home", Type: "menu", MenuPath: "/admin/home/", APIPath: "", Method: "", UniqueAuthKey: "admin-home", Sort: 1, Status: 1},

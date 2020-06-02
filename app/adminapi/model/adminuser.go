@@ -19,20 +19,18 @@ import (
 // RefreshToken 随机生成32位字符串保存到Redis中，也无需保存到数据库
 type AdminUser struct {
 	// gorm.Model
-	ID        uint           `gorm:"primary_key" json:"id"`
-	CreatedAt global.SQLTime `gorm:"type:datetime;" json:"created_at"`
-	UpdatedAt global.SQLTime `gorm:"type:datetime;" json:"updated_at"`
-	Username  string         `gorm:"type:varchar(100);unique_index;not null" json:"username"`
-	Password  string         `gorm:"type:varchar(100);not null" json:"-"`
-	// RoleID    uint           `json:"role_id"`
-	// Role      Role           `json:"role"`
-	Roles          []Role      `gorm:"many2many:admin_user_role;association_autoupdate:false;" json:"roles"`
-	SuperAdmin     bool        `gorm:"-" json:"super_admin"`      // 是否超级管理员
-	Menus          []*Menu     `gorm:"-" json:"menus"`            // 所有菜单
-	MenusTree      []*MenuTree `gorm:"-" json:"menus_tree"`       // 菜单树
-	UniqueAuthKeys []string    `gorm:"-" json:"unique_auth_keys"` // 所有鉴权key
-	Phone          string      `gorm:"type:char(11);not null" json:"phone"`
-	Status         int8        `gorm:"type:tinyint(1);default:1" json:"status"`
+	ID             uint           `gorm:"primary_key" json:"id"`
+	CreatedAt      global.SQLTime `gorm:"type:datetime;" json:"created_at"`
+	UpdatedAt      global.SQLTime `gorm:"type:datetime;" json:"updated_at"`
+	Username       string         `gorm:"type:varchar(100);unique_index;not null" json:"username"`
+	Password       string         `gorm:"type:varchar(100);not null" json:"-"`
+	Roles          []Role         `gorm:"many2many:admin_user_role;association_autoupdate:false;" json:"roles"`
+	SuperAdmin     bool           `gorm:"-" json:"super_admin"`      // 是否超级管理员
+	Menus          []*Menu        `gorm:"-" json:"menus"`            // 所有菜单
+	MenusTree      []*MenuTree    `gorm:"-" json:"menus_tree"`       // 菜单树
+	UniqueAuthKeys []string       `gorm:"-" json:"unique_auth_keys"` // 所有鉴权key
+	Phone          string         `gorm:"type:char(11);not null" json:"phone"`
+	Status         int8           `gorm:"type:tinyint(1);default:1" json:"status"`
 }
 
 // CheckLogin 登录检查
