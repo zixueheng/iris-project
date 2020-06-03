@@ -3,5 +3,5 @@ host: localhost
 port: 3306
 name: iris-project
 user: root
-password: 123
+password: 123 #;Hyl864xdd200
 debug: true

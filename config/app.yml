@@ -6,4 +6,4 @@ host: 127.0.0.1
 port: 8080
 timeformat: "2006-01-02 15:04:05"
 jwtsecret: jwtsecret123
-loglevel: debug # disable fatal error warn info debug
+loglevel: info # disable fatal error warn info debug

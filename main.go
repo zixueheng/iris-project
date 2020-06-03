@@ -74,7 +74,8 @@ func NewApp() *iris.Application {
 
 	app.Use(recover.New()) // Recover 会从paincs中恢复并返回 500 错误码
 
-	app.HandleDir("/static", "./assets", iris.DirOptions{ShowList: true, Gzip: true})
+	// 建议：使用Web服务器 服务静态文件
+	// app.HandleDir("/static", "./assets", iris.DirOptions{ShowList: true, Gzip: true})
 
 	iris.RegisterOnInterrupt(func() {
 		_ = global.Db.Close()

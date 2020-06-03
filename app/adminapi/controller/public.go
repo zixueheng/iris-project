@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"iris-project/app"
 	"iris-project/app/adminapi/model"
 	"iris-project/app/adminapi/validate"
@@ -171,7 +172,13 @@ func (p *Public) PostRefreshtoken() {
 	// for key, value := range data {
 	// 	ctx.Writef("%s = %s\n", key, value)
 	// }
-	adminUseID := data["admin_user_id"].(string)
+	// adminUseID := data["admin_user_id"].(string)
+	var adminUseID string
+	if value, ok := data["admin_user_id"]; ok {
+		adminUseID = value.(string)
+	} else {
+		app.ResponseProblemHTTPCode(p.Ctx, iris.StatusBadRequest, errors.New("Token中没有admin_user_id"))
+	}
 
 	param := struct {
 		RefreshToken string `json:"refresh_token"`
