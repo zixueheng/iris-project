@@ -25,7 +25,7 @@ func Auth(ctx iris.Context) {
 	// }
 
 	var adminUseID, exp string
-	if value, ok := data["admin_user_id"]; ok {
+	if value, ok := data[global.AdminUserJWTKey]; ok {
 		adminUseID = value.(string)
 	} else {
 		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有admin_user_id"))

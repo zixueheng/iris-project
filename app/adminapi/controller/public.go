@@ -199,7 +199,7 @@ func (p *Public) PostRefreshtoken() {
 	} else if param.RefreshToken != refreshToken {
 		p.Ctx.JSON(app.APIData(false, app.CodeRefreshTokenInvalidated, "", nil))
 	} else {
-		token, refreshToken := app.GenTokenAndRefreshToken("admin_user_id", util.ParseInt(adminUseID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
+		token, refreshToken := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, util.ParseInt(adminUseID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
 		response := struct {
 			Token        string `json:"token"`
 			RefreshToken string `json:"refresh_token"`

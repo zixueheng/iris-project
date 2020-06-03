@@ -10,6 +10,9 @@ const (
 	// AdminUserCacheMinutes 管理员信息缓存时间/分钟
 	AdminUserCacheMinutes = 60
 
+	// AdminUserJWTKey JWT荷载playload中要保存的键名
+	AdminUserJWTKey = "admin_user_id"
+
 	// SuperAdminUserTag 超级管理员Tag
 	SuperAdminUserTag = "superadmin"
 )

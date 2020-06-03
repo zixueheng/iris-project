@@ -41,7 +41,7 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 		return nil, false, app.CodeUserForbidden
 	} else {
 		if bcrypt.Match(loginInfo.Password, au.Password) {
-			token, refreshToken := app.GenTokenAndRefreshToken("admin_user_id", int(au.ID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
+			token, refreshToken := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, int(au.ID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
 			au.GetAdminUserByID(au.ID)
 
 			json, _ := json.Marshal(au)
