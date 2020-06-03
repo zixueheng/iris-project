@@ -174,10 +174,10 @@ func (p *Public) PostRefreshtoken() {
 	// }
 	// adminUseID := data["admin_user_id"].(string)
 	var adminUseID string
-	if value, ok := data["admin_user_id"]; ok {
+	if value, ok := data[global.AdminUserJWTKey]; ok {
 		adminUseID = value.(string)
 	} else {
-		app.ResponseProblemHTTPCode(p.Ctx, iris.StatusBadRequest, errors.New("Token中没有admin_user_id"))
+		app.ResponseProblemHTTPCode(p.Ctx, iris.StatusBadRequest, errors.New("Token中没有"+global.AdminUserJWTKey))
 	}
 
 	param := struct {
