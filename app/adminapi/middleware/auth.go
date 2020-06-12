@@ -49,7 +49,7 @@ func Auth(ctx iris.Context) {
 	}
 
 	var adminUser = new(model.AdminUser)
-	cacheAdminUser, err := global.Redis.Get("vo_admin_user_" + adminUseID).Result() // 加载redis中账号信息
+	cacheAdminUser, err := global.Redis.Get(config.App.Appname + ":vo_admin_user_" + adminUseID).Result() // 加载redis中账号信息
 	if err == redis.Nil {
 		if !adminUser.GetAdminUserByID(uint(util.ParseInt(adminUseID))) {
 			ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil)) // 账号不存在
@@ -63,7 +63,7 @@ func Auth(ctx iris.Context) {
 			return
 		}
 		json, _ := json.Marshal(adminUser)
-		global.Redis.Set("vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
+		global.Redis.Set(config.App.Appname+":vo_admin_user_"+adminUseID, string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
 
 		if !adminUser.SuperAdmin { // 不是超级管理员 检查权限
 			if !checkRight(adminUser, ctx.GetCurrentRoute().ResolvePath(), ctx.GetCurrentRoute().Method()) {

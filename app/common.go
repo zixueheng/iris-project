@@ -62,7 +62,7 @@ func GenTokenAndRefreshToken(key string, id int, tokenMinutes, refreshTokenMinut
 	refreshToken := util.GetRandomString(64)
 
 	// 保持刷新token到Redis中
-	err := global.Redis.Set("refresh_token_admin_"+util.ParseString(id), refreshToken, time.Minute*time.Duration(refreshTokenMinutes)).Err()
+	err := global.Redis.Set(config.App.Appname+":refresh_token_admin_"+util.ParseString(id), refreshToken, time.Minute*time.Duration(refreshTokenMinutes)).Err()
 	if err != nil {
 		panic(err)
 	}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"iris-project/app"
 	"iris-project/app/adminapi/validate"
+	"iris-project/config"
 	"iris-project/global"
 	"iris-project/lib/util"
 	"time"
@@ -45,7 +46,7 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 			au.GetAdminUserByID(au.ID)
 
 			json, _ := json.Marshal(au)
-			global.Redis.Set("vo_admin_user_"+util.ParseString(int(au.ID)), string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
+			global.Redis.Set(config.App.Appname+":vo_admin_user_"+util.ParseString(int(au.ID)), string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
 
 			response := struct {
 				Token        string `json:"token"`

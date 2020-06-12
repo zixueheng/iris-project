@@ -5,6 +5,7 @@ import (
 	"iris-project/app"
 	"iris-project/app/adminapi/model"
 	"iris-project/app/adminapi/validate"
+	"iris-project/config"
 	"iris-project/global"
 	"iris-project/lib/util"
 	"iris-project/middleware"
@@ -193,7 +194,7 @@ func (p *Public) PostRefreshtoken() {
 		return
 	}
 
-	refreshToken, err := global.Redis.Get("refresh_token_admin_" + adminUseID).Result()
+	refreshToken, err := global.Redis.Get(config.App.Appname + ":refresh_token_admin_" + adminUseID).Result()
 	if err == redis.Nil {
 		p.Ctx.JSON(app.APIData(false, app.CodeRefreshTokenExpired, "", nil))
 	} else if param.RefreshToken != refreshToken {
