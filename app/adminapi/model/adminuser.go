@@ -76,7 +76,7 @@ func (au *AdminUser) GetAdminUserByID(id uint) bool {
 		if role.Tag == global.SuperAdminUserTag {
 			au.SuperAdmin = true
 			menus := make([]*Menu, 0)
-			global.Db.Where("status=?", 1).Find(&menus) // 所有菜单
+			global.Db.Where("status=?", 1).Order("sort asc").Find(&menus) // 所有菜单
 			role.Menus = menus
 		} else {
 			role.GetRoleMenusByID(role.ID) // 加载角色菜单

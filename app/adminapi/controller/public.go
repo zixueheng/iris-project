@@ -56,18 +56,29 @@ func (p *Public) GetInit() string {
 
 	menus := []*model.Menu{
 		{ID: 1, PID: 0, Name: "主页", Icon: "md-home", Type: "menu", MenuPath: "/admin/home/", APIPath: "", Method: "", UniqueAuthKey: "admin-home", Sort: 1, Status: 1},
-		{ID: 2, PID: 1, Name: "首页统计接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/statistic", Method: "GET", UniqueAuthKey: "admin-home-statistic", Sort: 0, Status: 1},
+		{ID: 2, PID: 1, Name: "首页统计", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/statistic", Method: "GET", UniqueAuthKey: "admin-home-statistic", Sort: 0, Status: 1},
 
-		{ID: 3, PID: 0, Name: "权限管理", Icon: "md-settings", Type: "menu", MenuPath: "/admin/setting/", APIPath: "", Method: "", UniqueAuthKey: "admin-setting", Sort: 2, Status: 1},
+		{ID: 3, PID: 0, Name: "权限管理", Icon: "md-settings", Type: "menu", MenuPath: "/admin/setting/", APIPath: "", Method: "", UniqueAuthKey: "admin-setting", Sort: 100, Status: 1},
+
 		{ID: 4, PID: 3, Name: "管理员", Icon: "", Type: "menu", MenuPath: "/admin/setting/adminuser", APIPath: "", Method: "", UniqueAuthKey: "admin-setting-adminuser", Sort: 0, Status: 1},
-		{ID: 5, PID: 4, Name: "管理员列表接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/list/%v/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-list", Sort: 0, Status: 1},
-		{ID: 6, PID: 4, Name: "管理员详情接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-info", Sort: 0, Status: 1},
-		{ID: 7, PID: 4, Name: "管理员添加编辑接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser", Method: "POST", UniqueAuthKey: "admin-setting-adminuser-save", Sort: 0, Status: 1},
-		{ID: 8, PID: 4, Name: "管理员删除接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-adminuser-delete", Sort: 0, Status: 1},
-		{ID: 9, PID: 4, Name: "管理员禁用启用接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-status", Sort: 0, Status: 1},
+		{ID: 5, PID: 4, Name: "管理员列表", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/list/%v/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-list", Sort: 0, Status: 1},
+		{ID: 6, PID: 4, Name: "管理员详情", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-info", Sort: 0, Status: 1},
+		{ID: 7, PID: 4, Name: "管理员添加编辑", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser", Method: "POST", UniqueAuthKey: "admin-setting-adminuser-save", Sort: 0, Status: 1},
+		{ID: 8, PID: 4, Name: "管理员删除", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-adminuser-delete", Sort: 0, Status: 1},
+		{ID: 9, PID: 4, Name: "管理员禁用启用", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-status", Sort: 0, Status: 1},
+
 		{ID: 10, PID: 3, Name: "角色", Icon: "", Type: "menu", MenuPath: "/admin/setting/role", APIPath: "", Method: "", UniqueAuthKey: "admin-setting-role", Sort: 0, Status: 1},
-		{ID: 11, PID: 10, Name: "角色列表接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role/list/%v/%v", Method: "GET", UniqueAuthKey: "admin-setting-role-list", Sort: 0, Status: 1},
-		{ID: 12, PID: 10, Name: "角色添加编辑接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role", Method: "POST", UniqueAuthKey: "admin-setting-role-save", Sort: 0, Status: 1},
+		{ID: 11, PID: 10, Name: "角色列表", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role/list/%v/%v", Method: "GET", UniqueAuthKey: "admin-setting-role-list", Sort: 0, Status: 1},
+		{ID: 12, PID: 10, Name: "角色添加编辑", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role", Method: "POST", UniqueAuthKey: "admin-setting-role-save", Sort: 0, Status: 1},
+		{ID: 13, PID: 10, Name: "角色详情", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role/%v", Method: "GET", UniqueAuthKey: "admin-setting-role-info", Sort: 0, Status: 1},
+		{ID: 14, PID: 10, Name: "角色删除", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-role-delete", Sort: 0, Status: 1},
+		{ID: 15, PID: 10, Name: "角色禁用或启用", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/role/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-role-status", Sort: 0, Status: 1},
+
+		{ID: 16, PID: 3, Name: "菜单", Icon: "", Type: "menu", MenuPath: "/admin/setting/menu", APIPath: "", Method: "", UniqueAuthKey: "admin-setting-menu", Sort: 0, Status: 1},
+		{ID: 17, PID: 16, Name: "菜单列表", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu/tree", Method: "GET", UniqueAuthKey: "admin-setting-menu-tree", Sort: 0, Status: 1},
+		{ID: 18, PID: 16, Name: "菜单添加编辑", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu", Method: "POST", UniqueAuthKey: "admin-setting-menu-save", Sort: 0, Status: 1},
+		{ID: 19, PID: 16, Name: "菜单删除", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-menu-delete", Sort: 0, Status: 1},
+		{ID: 20, PID: 16, Name: "菜单禁用或启用", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-menu-status", Sort: 0, Status: 1},
 	}
 	for _, m := range menus {
 		global.Db.Create(m)
@@ -106,11 +117,11 @@ func (p *Public) GetInit2() string {
 
 		{ID: 3, PID: 0, Name: "权限管理", Icon: "md-settings", Type: "menu", MenuPath: "/admin/setting/", APIPath: "", Method: "", UniqueAuthKey: "admin-setting", Sort: 2, Status: 1},
 		{ID: 4, PID: 3, Name: "管理员", Icon: "", Type: "menu", MenuPath: "/admin/setting/adminuser", APIPath: "", Method: "", UniqueAuthKey: "admin-setting-adminuser", Sort: 0, Status: 1},
-		{ID: 5, PID: 4, Name: "管理员列表接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/list/%v/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-list", Sort: 0, Status: 1},
-		{ID: 6, PID: 4, Name: "管理员详情接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-info", Sort: 0, Status: 1},
-		{ID: 7, PID: 4, Name: "管理员添加编辑接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser", Method: "POST", UniqueAuthKey: "admin-setting-adminuser-save", Sort: 0, Status: 1},
-		{ID: 8, PID: 4, Name: "管理员删除接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-adminuser-delete", Sort: 0, Status: 1},
-		{ID: 9, PID: 4, Name: "管理员禁用启用接口", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-status", Sort: 0, Status: 1},
+		{ID: 5, PID: 4, Name: "管理员列表", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/list/%v/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-list", Sort: 0, Status: 1},
+		{ID: 6, PID: 4, Name: "管理员详情", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-info", Sort: 0, Status: 1},
+		{ID: 7, PID: 4, Name: "管理员添加编辑", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser", Method: "POST", UniqueAuthKey: "admin-setting-adminuser-save", Sort: 0, Status: 1},
+		{ID: 8, PID: 4, Name: "管理员删除", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-adminuser-delete", Sort: 0, Status: 1},
+		{ID: 9, PID: 4, Name: "管理员禁用启用", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/adminuser/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-adminuser-status", Sort: 0, Status: 1},
 	}
 	// for _, m := range menus {
 	// 	global.Db.Create(m)
