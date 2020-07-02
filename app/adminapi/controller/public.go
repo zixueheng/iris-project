@@ -163,15 +163,12 @@ func (p *Public) PostLogin() {
 	p.Ctx.JSON(app.APIData(ok, code, "", response))
 }
 
-// PostRefreshtoken 刷新缓存
+// PostRefreshtoken 刷新缓存（验证token不判断是否过期）
 func (p *Public) PostRefreshtoken() {
 	value := p.Ctx.Values().Get("jwt").(*jwt.Token) // 这里要先给这个路由方法添加JWT的中间件才能获取到 jwt变量
 
 	data := value.Claims.(jwt.MapClaims)
-	// for key, value := range data {
-	// 	ctx.Writef("%s = %s\n", key, value)
-	// }
-	// adminUseID := data["admin_user_id"].(string)
+
 	var adminUseID string
 	if value, ok := data[global.AdminUserJWTKey]; ok {
 		adminUseID = value.(string)
@@ -210,7 +207,7 @@ func (p *Public) PostRefreshtoken() {
 	}
 }
 
-// PostResetPassword 修改密码
+// PostResetPassword 修改密码（验证token并判断是否过期）
 func (p *Public) PostResetPassword() {
 	value := p.Ctx.Values().Get("jwt").(*jwt.Token) // 这里要先给这个路由方法添加JWT的中间件才能获取到 jwt变量
 
