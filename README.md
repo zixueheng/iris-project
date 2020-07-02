@@ -1209,7 +1209,7 @@ Iris MVC 多模块设计 + Gorm + MySQL + Redis
 - URL: http://localhost:8080/adminapi/menu
 - Method: Post
 - Header: authorization: bearer token(登录获取的token)
-- Body: `{"id":17,"p_id": 10,"name": "角色删除接口1","icon": "","type": "api","menu_path": "","api_path": "/adminapi/role/%v","method": "DELETE","unique_auth_key":"admin-setting-role-delete","sort": 0,"status": 1}` (json里面有`id`字段就是编辑、没有就是新增，type是类型：api接口、menu菜单)
+- Body: `{"id":17,"p_id": 10,"name": "角色删除接口1","icon": "","type": "api","menu_path": "","api_path": "/adminapi/role/%v","method": "DELETE","unique_auth_key":"admin-setting-role-delete","header": "","is_header": 0,"sort": 0,"status": 1}` (json里面有`id`字段就是编辑、没有就是新增，type是类型：api接口、menu菜单)
 - Response:
 ```json
 {

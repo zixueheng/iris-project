@@ -24,12 +24,14 @@ type AdminUser struct {
 	CreatedAt      global.SQLTime `gorm:"type:datetime;" json:"created_at"`
 	UpdatedAt      global.SQLTime `gorm:"type:datetime;" json:"updated_at"`
 	Username       string         `gorm:"type:varchar(100);unique_index;not null" json:"username"`
+	Realname       string         `gorm:"type:varchar(100);not null" json:"realname"`
 	Password       string         `gorm:"type:varchar(100);not null" json:"-"`
 	Roles          []Role         `gorm:"many2many:admin_user_role;association_autoupdate:false;" json:"roles"`
-	SuperAdmin     bool           `gorm:"-" json:"super_admin"`      // 是否超级管理员
-	Menus          []*Menu        `gorm:"-" json:"menus"`            // 所有菜单
-	MenusTree      []*MenuTree    `gorm:"-" json:"menus_tree"`       // 菜单树
-	UniqueAuthKeys []string       `gorm:"-" json:"unique_auth_keys"` // 所有鉴权key
+	SuperAdmin     bool           `gorm:"-" json:"super_admin"` // 是否超级管理员
+	Menus          []*Menu        `gorm:"-" json:"menus"`       // 所有菜单和接口
+	MenusTree      []*MenuTree    `gorm:"-" json:"-"`           // 所有菜单和接口树
+	OnlyMenusTree  []*MenuTree    `gorm:"-" json:"-"`           // 只有菜单树
+	UniqueAuthKeys []string       `gorm:"-" json:"-"`           // 所有鉴权key
 	Phone          string         `gorm:"type:char(11);not null" json:"phone"`
 	Status         int8           `gorm:"type:tinyint(1);default:1" json:"status"`
 }
@@ -43,19 +45,48 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 	} else {
 		if bcrypt.Match(loginInfo.Password, au.Password) {
 			token, refreshToken := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, int(au.ID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
-			au.GetAdminUserByID(au.ID)
+
+			au.GetAdminUser()
 
 			json, _ := json.Marshal(au)
 			global.Redis.Set(config.App.Appname+":vo_admin_user_"+util.ParseString(int(au.ID)), string(json), time.Minute*time.Duration(global.AdminUserCacheMinutes)) // 账号信息保存到redis
 
+			type userInfo struct {
+				ID         uint   `json:"id"`
+				SuperAdmin bool   `json:"super_admin"`
+				Username   string `json:"account"`
+				Realname   string `json:"realname"`
+				HeadPic    string `json:"head_pic"`
+			}
+
+			expiresTime := time.Now().Add(time.Minute * time.Duration(global.AdminTokenMinutes)) // token 的过期时间
+
 			response := struct {
-				Token        string `json:"token"`
-				RefreshToken string `json:"refresh_token"`
-				AdminUser    `json:"admin_user"`
+				Token        string      `json:"token"`
+				ExpiresTime  int64       `json:"expires_time"`
+				RefreshToken string      `json:"refresh_token"`
+				Menus        []*MenuTree `json:"menus"`
+				UniqueAuth   []string    `json:"unique_auth"`
+				UserInfo     userInfo    `json:"user_info"`
+				Logo         string      `json:"logo"`
+				LogoSquare   string      `json:"logo_square"`
+				Version      string      `json:"version"`
 			}{
 				Token:        token,
+				ExpiresTime:  expiresTime.Unix(),
 				RefreshToken: refreshToken,
-				AdminUser:    *au,
+				Menus:        au.OnlyMenusTree,
+				UniqueAuth:   au.UniqueAuthKeys,
+				UserInfo: userInfo{
+					ID:         au.ID,
+					Username:   au.Username,
+					Realname:   au.Realname,
+					SuperAdmin: au.SuperAdmin,
+					HeadPic:    "",
+				},
+				// Logo:       config.App.Fronturl + "/Logo.png",
+				// LogoSquare: config.App.Fronturl + "/LogoSquare.png",
+				Version: "1.0.0",
 			}
 
 			return response, true, app.CodeUserLoginSucceed
@@ -66,9 +97,12 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 
 }
 
-// GetAdminUserByID 根据ID获取管理员（包括角色、菜单、菜单树）
-func (au *AdminUser) GetAdminUserByID(id uint) bool {
-	if err := global.Db.Where("id=?", id).Preload("Roles", "status=?", 1).First(au).Error; gorm.IsRecordNotFoundError(err) {
+// GetAdminUser 获取管理员（包括角色、菜单、菜单树）
+func (au *AdminUser) GetAdminUser() bool {
+	if au.ID == 0 {
+		return false
+	}
+	if err := global.Db.Preload("Roles", "status=?", 1).First(au).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
 
@@ -79,7 +113,7 @@ func (au *AdminUser) GetAdminUserByID(id uint) bool {
 			global.Db.Where("status=?", 1).Order("sort asc").Find(&menus) // 所有菜单
 			role.Menus = menus
 		} else {
-			role.GetRoleMenusByID(role.ID) // 加载角色菜单
+			role.GetRoleMenus() // 加载角色菜单
 		}
 
 		for _, menu := range role.Menus {
@@ -91,9 +125,16 @@ func (au *AdminUser) GetAdminUserByID(id uint) bool {
 			}
 		}
 	}
-	au.MenusTree = GetTreeMenus(au.Menus)
+	au.MenusTree = GetTreeMenus(au.Menus) // 菜单包含接口
+
+	onlyMenus := make([]*Menu, 0)
+	for _, m := range au.Menus {
+		if m.Type == "menu" {
+			onlyMenus = append(onlyMenus, m)
+		}
+	}
+	au.OnlyMenusTree = GetTreeMenus(onlyMenus) // 菜单不包含接口
 	return true
-	// return FindOne(au, map[string]interface{}{"username": username}, "Role")
 }
 
 func checkMenus(menus []*Menu, menu Menu) bool {

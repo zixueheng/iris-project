@@ -16,28 +16,39 @@ type Role struct {
 	Tag       string         `gorm:"type:varchar(50);unique" json:"tag"`
 	Menus     []*Menu        `gorm:"many2many:role_menu;association_autoupdate:false" json:"-"`
 	MenusTree []*MenuTree    `gorm:"-" json:"menus_tree,omitempty"`
+	MenuNames string         `gorm:"-" json:"menu_names"` // 菜单名，用 逗号 分隔
+	MenuIDS   []uint         `gorm:"-" json:"menu_ids"`   // 菜单IDS
 	Status    int8           `gorm:"type:tinyint(1);default:1" json:"status"`
 }
 
-// GetRoleByID 根据ID获取角色（不包含菜单）
-func (r *Role) GetRoleByID(id uint) bool {
-	if err := global.Db.Where("id=?", id).First(r).Error; gorm.IsRecordNotFoundError(err) {
+// GetRole 获取角色（不包含菜单）
+func (r *Role) GetRole() bool {
+	if r.ID == 0 {
+		return false
+	}
+	if err := global.Db.First(r).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
 	return true
 }
 
-// GetRoleMenusByID 根据ID获取角色（包含菜单）
-func (r *Role) GetRoleMenusByID(id uint) bool {
-	if err := global.Db.Where("id=?", id).Preload("Menus").First(r).Error; gorm.IsRecordNotFoundError(err) {
+// GetRoleMenus 获取角色（包含菜单）
+func (r *Role) GetRoleMenus() bool {
+	if r.ID == 0 {
+		return false
+	}
+	if err := global.Db.Preload("Menus").First(r).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
 	return true
 }
 
-// GetRoleMenusTreeByID 根据ID获取角色（包含菜单和菜单数）
-func (r *Role) GetRoleMenusTreeByID(id uint) bool {
-	if err := global.Db.Where("id=?", id).Preload("Menus").First(r).Error; gorm.IsRecordNotFoundError(err) {
+// GetRoleMenusTree 获取角色（包含菜单和菜单数）
+func (r *Role) GetRoleMenusTree() bool {
+	if r.ID == 0 {
+		return false
+	}
+	if err := global.Db.Preload("Menus").First(r).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
 	r.MenusTree = GetTreeMenus(r.Menus)

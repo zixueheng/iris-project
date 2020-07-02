@@ -10,12 +10,14 @@ import (
 // App 项目配置
 var App = struct {
 	Appname    string
+	Fronturl   string
 	HTTPS      bool
 	Certpath   string
 	Certkey    string
 	Host       string
 	Port       uint
 	Timeformat string
+	Dateformat string
 	Jwtsecret  string
 	LogLevel   string
 }{}

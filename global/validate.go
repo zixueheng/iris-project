@@ -25,7 +25,12 @@ func init() {
 	Validate = validator.New()
 	// 收集结构体中的comment标签，用于替换英文字段名称，这样返回错误就能展示中文字段名称了
 	Validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		return fld.Tag.Get("comment")
+		comment := fld.Tag.Get("comment")
+		if comment == "" {
+			return fld.Name
+		}
+		return comment
+		// return fld.Tag.Get("comment")
 	})
 	if err := zh_translations.RegisterDefaultTranslations(Validate, ValidateTrans); err != nil {
 		fmt.Println(fmt.Sprintf("RegisterDefaultTranslations %v", err))

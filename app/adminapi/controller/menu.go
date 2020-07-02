@@ -5,6 +5,7 @@ import (
 	"iris-project/app/adminapi/model"
 	"iris-project/app/adminapi/validate"
 	"iris-project/global"
+	"strings"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
@@ -27,6 +28,30 @@ func (m *Menu) GetMenuTree() {
 	m.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", tree))
 }
 
+// GetMenuSelect 菜单下拉选择项
+func (m *Menu) GetMenuSelect() {
+	var list []*model.Menu
+	global.Db.Where("status=?", 1).Order("sort asc").Find(&list)
+
+	var box = make([]*model.Menu, 0)
+	var root = &model.Menu{ID: 0, Name: "顶级按钮", Level: 0, HTML: ""}
+	box = append(box, root)
+	var fn func([]*model.Menu, *model.Menu)
+	fn = func(ls []*model.Menu, node *model.Menu) {
+		for _, v := range ls {
+			if v.PID == node.ID {
+				v.Level = node.Level + 1
+				v.HTML = strings.Repeat("|----", v.Level)
+				box = append(box, v)
+				fn(ls, v)
+			}
+		}
+	}
+	fn(list, root)
+
+	m.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", box))
+}
+
 // PostMenu 创建或更新菜单
 func (m *Menu) PostMenu() {
 	postInfo := new(validate.MenuRequest)
@@ -47,6 +72,8 @@ func (m *Menu) PostMenu() {
 		APIPath:       postInfo.APIPath,
 		Method:        postInfo.Method,
 		UniqueAuthKey: postInfo.UniqueAuthKey,
+		Header:        postInfo.Header,
+		IsHeader:      postInfo.IsHeader,
 		Sort:          postInfo.Sort,
 		Status:        postInfo.Status,
 	}
@@ -62,7 +89,8 @@ func (m *Menu) PostMenu() {
 // DeleteMenuBy 删除菜单(包含子菜单)
 func (m *Menu) DeleteMenuBy(id uint) {
 	menu := new(model.Menu)
-	if !menu.GetMenuByID(id) {
+	menu.ID = id
+	if !menu.GetMenu() {
 		m.Ctx.JSON(app.APIData(false, app.CodeNotFound, "", nil))
 		return
 	}
@@ -98,7 +126,8 @@ func getChild(allIDs *[]uint, id uint) {
 // GetMenuStatusBy 禁用或启用菜单
 func (m *Menu) GetMenuStatusBy(id uint) {
 	menu := new(model.Menu)
-	if !menu.GetMenuByID(id) {
+	menu.ID = id
+	if !menu.GetMenu() {
 		m.Ctx.JSON(app.APIData(false, app.CodeNotFound, "", nil))
 		return
 	}

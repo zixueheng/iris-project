@@ -50,8 +50,10 @@ func Auth(ctx iris.Context) {
 
 	var adminUser = new(model.AdminUser)
 	cacheAdminUser, err := global.Redis.Get(config.App.Appname + ":vo_admin_user_" + adminUseID).Result() // 加载redis中账号信息
+	// fmt.Println(cacheAdminUser)
 	if err == redis.Nil {
-		if !adminUser.GetAdminUserByID(uint(util.ParseInt(adminUseID))) {
+		adminUser.ID = uint(util.ParseInt(adminUseID))
+		if !adminUser.GetAdminUser() {
 			ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil)) // 账号不存在
 			ctx.StopExecution()
 			return
@@ -83,6 +85,7 @@ func Auth(ctx iris.Context) {
 			}
 		}
 	}
+	// fmt.Printf("%+v\n", adminUser)
 	ctx.Values().Set("auth_admin_user", adminUser) // 将 admin_user 存储到 ctx 中 以共享
 	ctx.Next()
 }

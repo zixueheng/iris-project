@@ -14,27 +14,36 @@ type SQLTime time.Time
 
 // UnmarshalJSON ...
 func (t *SQLTime) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" {
-		return nil
-	}
 	var err error
 	//前端接收的时间字符串
 	str := string(data)
 	//去除接收的str收尾多余的"
-	timeStr := strings.Trim(str, "\"")
-	t1, err := time.Parse(config.App.Timeformat, timeStr)
+	str = strings.Trim(str, "\"")
+
+	if str == "null" || str == "" {
+		return nil
+	}
+
+	t1, err := time.Parse(config.App.Timeformat, str)
 	*t = SQLTime(t1)
 	return err
 }
 
 // MarshalJSON ...
 func (t SQLTime) MarshalJSON() ([]byte, error) {
+	// fmt.Println("AAA")
+	// if time.Time(t).IsZero() {
+	// 	return []byte(""), nil
+	// }
 	formatted := fmt.Sprintf("\"%v\"", time.Time(t).Format(config.App.Timeformat))
 	return []byte(formatted), nil
 }
 
 // Value ...
 func (t SQLTime) Value() (driver.Value, error) {
+	// if time.Time(t).IsZero() {
+	// 	return "", nil
+	// }
 	// SQLTime 转换成 time.Time 类型
 	tTime := time.Time(t)
 	return tTime.Format(config.App.Timeformat), nil

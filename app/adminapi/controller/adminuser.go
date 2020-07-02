@@ -32,14 +32,18 @@ func (au *AdminUser) GetAdminuserListBy(page, size uint) {
 	}
 	var where = make(map[string]interface{})
 	if username := au.Ctx.URLParamDefault("username", ""); len(username) > 0 {
-		where["username"] = username
+		where["username like"] = "%" + username + "%"
 	}
+	if status := au.Ctx.URLParamIntDefault("status", 0); status != 0 {
+		where["status"] = status
+	}
+	conditionString, conditionValues, _ := app.BuildCondition(where)
 
 	var (
 		adminUsers []model.AdminUser
 		total      uint
 	)
-	global.Db.Where(where).Preload("Roles").Offset((page - 1) * size).Limit(size).Find(&adminUsers).Offset(-1).Limit(-1).Count(&total)
+	global.Db.Where(conditionString, conditionValues...).Order("id desc").Preload("Roles").Offset((page - 1) * size).Limit(size).Find(&adminUsers).Offset(-1).Limit(-1).Count(&total)
 	for i, adminUser := range adminUsers {
 		for _, role := range adminUser.Roles {
 			if role.Tag == global.SuperAdminUserTag {
@@ -51,10 +55,11 @@ func (au *AdminUser) GetAdminuserListBy(page, size uint) {
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", app.List{List: adminUsers, Total: total}))
 }
 
-// GetAdminuserBy 获取管理员详情
-func (au *AdminUser) GetAdminuserBy(id uint) {
+// GetAdminuserInfoBy 获取管理员详情
+func (au *AdminUser) GetAdminuserInfoBy(id uint) {
 	adminUser := new(model.AdminUser)
-	if !adminUser.GetAdminUserByID(id) {
+	adminUser.ID = id
+	if !adminUser.GetAdminUser() {
 		au.Ctx.JSON(app.APIData(true, app.CodeUserNotFound, "", nil))
 		return
 	}
@@ -75,13 +80,15 @@ func (au *AdminUser) PostAdminuser() {
 	adminUser := &model.AdminUser{
 		ID:       postInfo.ID,
 		Username: postInfo.Username,
+		Realname: postInfo.Realname,
 		Phone:    postInfo.Phone,
 		Status:   postInfo.Status,
 	}
 	roles := make([]model.Role, 0)
 	for _, rid := range postInfo.RoleIds {
 		role := new(model.Role)
-		role.GetRoleByID(rid)
+		role.ID = rid
+		role.GetRole()
 		if role.Tag == global.SuperAdminUserTag && len(postInfo.RoleIds) > 1 {
 			au.Ctx.JSON(app.APIData(false, app.CodeCustom, "超级管理员不可同时拥有其他角色", nil))
 			return
@@ -105,7 +112,8 @@ func (au *AdminUser) PostAdminuser() {
 // DeleteAdminuserBy 删除管理员
 func (au *AdminUser) DeleteAdminuserBy(id uint) {
 	adminUser := new(model.AdminUser)
-	if !adminUser.GetAdminUserByID(id) {
+	adminUser.ID = id
+	if !adminUser.GetAdminUser() {
 		au.Ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil))
 		return
 	}
@@ -124,15 +132,16 @@ func (au *AdminUser) DeleteAdminuserBy(id uint) {
 // GetAdminuserStatusBy 禁用或启用管理员
 func (au *AdminUser) GetAdminuserStatusBy(id uint) {
 	adminUser := new(model.AdminUser)
-	if !adminUser.GetAdminUserByID(id) {
+	adminUser.ID = id
+	if !adminUser.GetAdminUser() {
 		au.Ctx.JSON(app.APIData(false, app.CodeUserNotFound, "", nil))
 		return
 	}
 
-	if adminUser.SuperAdmin {
-		au.Ctx.JSON(app.APIData(false, app.CodeForbidden, "", nil))
-		return
-	}
+	// if adminUser.SuperAdmin {
+	// 	au.Ctx.JSON(app.APIData(false, app.CodeForbidden, "", nil))
+	// 	return
+	// }
 
 	if adminUser.Status == 1 {
 		if global.Db.Model(adminUser).Update("status", -1).RowsAffected > 0 {

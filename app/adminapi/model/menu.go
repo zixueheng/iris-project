@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"iris-project/global"
 
 	"github.com/jinzhu/gorm"
@@ -12,15 +13,20 @@ type Menu struct {
 	ID            uint           `gorm:"primary_key" json:"id"`
 	CreatedAt     global.SQLTime `gorm:"type:datetime;" json:"created_at"`
 	PID           uint           `gorm:"default:0" json:"p_id"`
-	Name          string         `gorm:"type:varchar(50);not null" json:"name"`
+	Name          string         `gorm:"type:varchar(50);not null" json:"title"`
 	Icon          string         `gorm:"type:varchar(50);" json:"icon"`
 	Type          string         `gorm:"type:enum(\"menu\",\"api\");not null" json:"type"`
-	MenuPath      string         `gorm:"" json:"menu_path"`             // 前端菜单路径
+	MenuPath      string         `gorm:"" json:"path"`                  // 前端菜单路径
 	UniqueAuthKey string         `gorm:"unique" json:"unique_auth_key"` // 前端鉴权key
 	APIPath       string         `gorm:"" json:"api_path"`              // 接口路径
-	Method        string         `gorm:"type:enum(\"GET\",\"POST\",\"PUT\",\"DELETE\");default:null" json:"method"`
+	Method        string         `gorm:"type:enum(\"GET\",\"POST\",\"PUT\",\"DELETE\",\"\");default:null" json:"method"`
+	Header        string         `gorm:"type:varchar(50);" json:"header"`
+	IsHeader      int8           `gorm:"type:tinyint(1);default:0" json:"is_header"`
 	Sort          uint           `gorm:"default:0" json:"sort"`
 	Status        int8           `gorm:"type:tinyint(1);default:1" json:"status"` // 1显示 -1隐藏
+	HTML          string         `gorm:"-" json:"html"`                           // 用来输出层级 |----
+	Level         int            `gorm:"-" json:"-"`                              // 计算层级
+	Checked       bool           `gorm:"-" json:"checked"`                        // 是否选中，角色接口中用
 }
 
 // MenuTree 菜单树
@@ -29,9 +35,12 @@ type MenuTree struct {
 	Children []*MenuTree `json:"children"`
 }
 
-// GetMenuByID 根据ID查找菜单
-func (m *Menu) GetMenuByID(id uint) bool {
-	if err := global.Db.Where("id=?", id).First(m).Error; gorm.IsRecordNotFoundError(err) {
+// GetMenu 查找菜单
+func (m *Menu) GetMenu() bool {
+	if m.ID == 0 {
+		return false
+	}
+	if err := global.Db.First(m).Error; gorm.IsRecordNotFoundError(err) {
 		return false
 	}
 	return true
@@ -40,10 +49,20 @@ func (m *Menu) GetMenuByID(id uint) bool {
 // CreateUpdateMenu 创建或更新菜单
 func (m *Menu) CreateUpdateMenu() error {
 	if m.ID == 0 {
+		var count uint
+		global.Db.Model(&Menu{}).Where("unique_auth_key=?", m.UniqueAuthKey).Count(&count)
+		if count > 0 {
+			return errors.New("鉴权Key重复")
+		}
 		if err := global.Db.Create(m).Error; err != nil {
 			return err
 		}
 	} else {
+		var count uint
+		global.Db.Model(&Menu{}).Where("unique_auth_key=? and id<>?", m.UniqueAuthKey, m.ID).Count(&count)
+		if count > 0 {
+			return errors.New("鉴权Key重复")
+		}
 		if err := global.Db.Model(m).Save(m).Error; err != nil {
 			return err
 		}
