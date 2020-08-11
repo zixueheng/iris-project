@@ -10,6 +10,7 @@ const (
 	CodeForbidden         Code = 403
 	CodeNotFound          Code = 404
 	CodeRequestParamError Code = 405
+	CodeDataHasRelation   Code = 406
 	CodeCustom            Code = 999 // 自定义错误
 )
 
@@ -40,6 +41,7 @@ var codeMap = map[Code]string{
 	CodeForbidden:         "禁止操作",
 	CodeNotFound:          "未找到或不存在",
 	CodeRequestParamError: "请求参数错误",
+	CodeDataHasRelation:   "数据存在关联，操作失败",
 
 	CodeUserLoginSucceed:  "登录成功",
 	CodeUserNotFound:      "账号不存在",
