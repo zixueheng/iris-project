@@ -84,6 +84,9 @@ func (p *Public) GetInit() string {
 		{ID: 20, PID: 17, Name: "权限删除", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu/%v", Method: "DELETE", UniqueAuthKey: "admin-setting-menu-delete", Header: "settings", IsHeader: 0, Sort: 0, Status: 1},
 		{ID: 21, PID: 17, Name: "权限禁用或启用", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu/status/%v", Method: "GET", UniqueAuthKey: "admin-setting-menu-status", Header: "settings", IsHeader: 0, Sort: 0, Status: 1},
 		{ID: 22, PID: 17, Name: "权限下拉选择项", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/menu/select", Method: "GET", UniqueAuthKey: "admin-setting-menu-select", Header: "settings", IsHeader: 0, Sort: 0, Status: 1},
+		
+		{ID: 23, PID: 3, Name: "数据备份", Icon: "", Type: "menu", MenuPath: "/admin/setting/dbbackup", APIPath: "", Method: "", UniqueAuthKey: "admin-setting-dbbackup", Header: "settings", IsHeader: 0, Sort: 0, Status: 1},
+		{ID: 24, PID: 23, Name: "数据库备份", Icon: "", Type: "api", MenuPath: "", APIPath: "/adminapi/system/db/backup", Method: "GET", UniqueAuthKey: "admin-setting-dbbackup-request", Header: "settings", IsHeader: 0, Sort: 0, Status: 1},
 	}
 	for _, m := range menus {
 		global.Db.Create(m)
