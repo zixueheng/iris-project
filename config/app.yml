@@ -1,0 +1,12 @@
+appname: iris-project # 金美亚建材
+fronturl: https://iris-project.myyll.com # 前端地址
+https: false
+certpath:
+certkey:
+# host: 127.0.0.1
+host: # docker 部署不指定主机地址
+port: 8080
+timeformat: "2006-01-02 15:04:05"
+dateformat: "2006-01-02"
+jwtsecret: jwtsecret123
+loglevel: info # disable fatal error warn info debug

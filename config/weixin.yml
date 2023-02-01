@@ -1,0 +1,8 @@
+# 微信配置
+debug: true
+weixinapp:
+  appid: wx5a08f69c70b549fe
+  appsecret: b37811f8c2f97e9bb59cb28296fe50cc
+weixinmin:
+  appid: wxae76db91f721b22d
+  appsecret: 556f14b01f32a5fd8d7d294e3e36709b

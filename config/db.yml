@@ -1,0 +1,22 @@
+adapter: mysql # mysql postgres sqlite3
+host: localhost # 主库，只支持一主多从
+# host: host.docker.internal # 从docker容器访问宿主机地址
+# host: mysql # docker-compose 使用
+port: 3306
+name: iris-project
+user: root
+password: 123456 #Tuj5T8764G*7tyO3i
+tableprefix: iris_
+# debug: true
+loglevel: Info # 新版gorm logger级别： Silent、Error、Warn、Info
+replicas: # 从库
+  # - host: 139.9.63.123
+  #   port: 3306
+  #   name: wuye
+  #   user: root
+  #   password: Tuj5T8764G*7tyO3i
+  # - host: 139.9.63.123
+  #   port: 3306
+  #   name: wuye
+  #   user: root
+  #   password: Tuj5T8764G*7tyO3i

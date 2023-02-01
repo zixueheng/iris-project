@@ -1,0 +1,14 @@
+android:
+  version: 1.0.0
+  downloadurl: http://60.174.35.222:8000/upload/1.0.0.apk
+  title: Android新版本1.0.0
+  msgs:
+    - 修改BUG
+    - 修改界面
+ios:
+  version: 1.0.0
+  downloadurl: http://60.174.35.222:8000/upload/1.0.0.apk
+  title: IOS新版本1.0.0
+  msgs:
+    - 修改BUG
+    - 修改界面

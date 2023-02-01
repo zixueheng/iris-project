@@ -1,0 +1,22 @@
+storage: local # 暂只支持本地上传
+maxsize: 5 # 单位 M
+local:
+  domain: https://wuye2.myyll.com
+qiniu:
+  domain:
+  accesskey:
+  secretkey:
+  bucket:
+  area:
+tencent:
+  domain:
+  accesskey:
+  secretkey:
+  bucket:
+  area:
+aliyun:
+  domain:
+  accesskey:
+  secretkey:
+  bucket:
+  area:

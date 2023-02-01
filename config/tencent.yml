@@ -1,0 +1,20 @@
+appid: 1305957094
+secretid: AKID4xbz6wWpthFWWFhtoRoukJbcNlsiIbdO
+secretkey: VjgMltkKdfQu8rTs20qSoujHZaLp2yf5
+sms: # 短信配置
+  appid: 1400565259
+  appkey: b3a067cbc0416d9e2ae1f7c8140bdd1d
+  sign: 申亚生物 # 签名
+  verifycodetemplete: 919684 # 验证码模板ID
+  # suppliernewpassword: 1172337 # 供应商新密码提醒
+  # customernewpassword: 1264406 # 客户新密码提醒
+  # purchasetemplete: # 采购模板
+  #   newinquirys: 1094072 # 1、采购需求单审核完毕后生成询价单，通知参与的供应商有新的询价单待处理
+  #   onceformdemandtimeend: 1094078 # 2、一次报价的采购需求单截止后，给生单管理员发送消息提示需要提交采购申请
+  #   twiceformdemandfirsttimeend: 1094086 # 3、二次报价的采购需求单第一次报价截止后，给参与的供应商发消息提示进行二次报价
+  #   twiceformdemandsecondtimeend: 1094088 # 4、二次报价的采购需求单第二次报价截止后，给生单管理员发消息提示需要提交采购申请
+  #   purchaseverifynotice: 1094092 # 5、采购需求单的生单管理员提交采购审核给老板发消息提示审核
+  #   purchaseverifyfailed: 1094098 # 6、采购审核不通过，给采购需求单生单管理员发消息提示采购审核失败需进行修改
+  #   # purchaseverifysucceedwinner: 1094104 # 7、采购审核通过后，给中标的供应商发消息提示上传合同并确认供货
+  #   purchaseverifysucceedwinner: 1459364 # 7、采购审核通过后，给中标的供应商发消息提示上传合同并确认供货
+  #   purchaseverifysucceedloser: 1094106 # 8、采购审核通过后，给未中标的供应商发消息感谢其参与
