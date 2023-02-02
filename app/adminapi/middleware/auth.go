@@ -17,6 +17,7 @@ import (
 	"iris-project/global"
 	"iris-project/lib/cache"
 	"iris-project/lib/util"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v7"
@@ -98,10 +99,10 @@ func Auth(ctx iris.Context) {
 
 // checkRight 检查权限
 func checkRight(adminUser *model.AdminUser, path, method string) (hasRight bool) {
-	return true
+	// return true
 
 	// fmt.Println("检查权限：", adminUser.Username, path, method)
-	/*  不控制权限
+
 	hasRight = false
 	menus := adminUser.Menus
 	for _, menu := range menus {
@@ -111,5 +112,5 @@ func checkRight(adminUser *model.AdminUser, path, method string) (hasRight bool)
 		}
 	}
 	return
-	*/
+
 }

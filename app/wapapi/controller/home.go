@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-03-19 14:01:28
- * @LastEditTime: 2022-09-29 09:52:38
+ * @LastEditTime: 2023-02-02 11:13:06
  */
 package controller
 
@@ -28,7 +28,7 @@ func (c *Home) BeforeActivation(b mvc.BeforeActivation) {
 
 // GetHome 首页信息
 func (c *Home) GetHome() {
-
+	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
 // GetHomeSystemConfig 获取系统配置

@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2022-09-29 10:59:47
+ * @LastEditTime: 2023-02-02 11:11:06
  */
 package routes
 
@@ -19,7 +19,7 @@ import (
 
 // InitWapAPI 初始化 WapApi 模块路由
 func InitWapAPI(app iris.Party) {
-	party := app.Party("/wapapi", middleware.CrsAuth()).AllowMethods(iris.MethodOptions)
+	party := app.Party("/wapapi", middleware.CrsAuth(), middleware.Sentinel()).AllowMethods(iris.MethodOptions)
 	mvc.Configure(party, loadWapAPIController)
 }
 
