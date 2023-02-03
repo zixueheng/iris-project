@@ -1,6 +1,9 @@
 appid: 1305957094
 secretid: AKID4xbz6wWpthFWWFhtoRoukJbcNlsiIbdO
 secretkey: VjgMltkKdfQu8rTs20qSoujHZaLp2yf5
+# 图形验证码
+captchaappid: 2052061423
+appsecretkey: 0x0a4kcN9yZdPgANjW55v3g**
 sms: # 短信配置
   appid: 1400565259
   appkey: b3a067cbc0416d9e2ae1f7c8140bdd1d

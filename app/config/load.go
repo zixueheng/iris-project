@@ -100,10 +100,12 @@ var (
 
 	// Tencent 腾讯云配置
 	Tencent = struct {
-		AppID     string
-		SecretID  string
-		SecretKey string
-		Sms       struct {
+		AppID        string
+		SecretID     string
+		SecretKey    string
+		CaptchaAppId uint64
+		AppSecretKey string
+		Sms          struct {
 			AppID              string
 			Appkey             string
 			Sign               string

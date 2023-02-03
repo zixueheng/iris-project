@@ -21,6 +21,7 @@
 # vendor/
 bin/
 pkg/
+log/
 upload/
 github.com/
 golang.org/

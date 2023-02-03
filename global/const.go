@@ -29,6 +29,13 @@ const (
 	// StaffCacheKeyPrefix 员工信息缓存key前缀
 	StaffCacheKeyPrefix = ":vo_staff_"
 
+	// MerchantJWTKey 商家端JWT荷载playload中要保存的键名
+	MerchantJWTKey = "merchant_id"
+	// MerchantTokenMinutes 商家Token有效期/分钟
+	MerchantTokenMinutes = 12 * 60
+	// MerchantRefreshTokenMinutes 商家RefreshToken 有效期/分钟
+	MerchantRefreshTokenMinutes = 7 * 24 * 60
+
 	// AdminTokenMinutes 管理员Token有效期/分钟
 	AdminTokenMinutes = 12 * 60
 	// AdminRefreshTokenMinutes 管理员RefreshToken 有效期/分钟

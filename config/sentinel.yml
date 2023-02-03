@@ -1,0 +1,15 @@
+# Sentinel 限流配置
+version: "v1"
+sentinel:
+  app:
+    name: iris-project
+    type: 0
+  log:
+    dir: "logs/csp"
+    pid: false
+    metric:
+      maxFileCount: 14
+      flushIntervalSec: 1
+  stat:
+    system:
+      collectIntervalMs: 1000
