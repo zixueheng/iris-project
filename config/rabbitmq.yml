@@ -1,4 +1,4 @@
-ip: 127.0.0.1:6379
+ip: 127.0.0.1
 port: 5672
 username: guest
 password: guest
