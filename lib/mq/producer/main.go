@@ -1,3 +1,11 @@
+/*
+ * @Description: The program is written by the author, if modified at your own risk.
+ * @Author: heyongliang
+ * @Email: 356126067@qq.com
+ * @Phone: 15215657185
+ * @Date: 2023-02-09 15:19:31
+ * @LastEditTime: 2023-02-09 16:50:54
+ */
 package main
 
 import (
@@ -7,7 +15,7 @@ import (
 	"time"
 )
 
-// 消费者
+// 生产者
 func main() {
 	rabbit := mq.NewRabbitMQ("yoyo_exchange", "yoyo_route", "yoyo_queue")
 	defer rabbit.Close()
