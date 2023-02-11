@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-01 16:15:07
- * @LastEditTime: 2023-02-01 16:27:27
+ * @LastEditTime: 2023-02-11 11:33:08
  */
 package config
 
@@ -53,6 +53,14 @@ var (
 			User     string
 			Password string
 		}
+	}{}
+
+	// ES elasticsearch配置
+	ES = struct {
+		On        bool
+		Addresses []string
+		Username  string
+		Password  string
 	}{}
 
 	// Jpush 极光推送
@@ -166,6 +174,10 @@ func init() {
 	}
 
 	if err := configor.New(&configor.Config{Debug: false}).Load(&DB, filepath.Join(rootpath, "config/db.yml")); err != nil {
+		panic(err)
+	}
+
+	if err := configor.New(&configor.Config{Debug: false}).Load(&ES, filepath.Join(rootpath, "config/es.yml")); err != nil {
 		panic(err)
 	}
 

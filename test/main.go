@@ -4,21 +4,29 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2022-03-23 10:19:50
- * @LastEditTime: 2023-02-09 16:45:04
+ * @LastEditTime: 2023-02-10 11:03:49
  */
 package main
 
 import (
 	"log"
 	"time"
+
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
 func main() {
-	forever := make(chan bool)
+
 	log.Println("执行开始")
-	test()
+
+	// forever := make(chan bool)
+	// test()
+	// <-forever
+
+	esTest()
+
 	log.Println("执行完成")
-	<-forever
+
 }
 
 func test() {
@@ -55,4 +63,20 @@ func test() {
 		}
 	}
 
+}
+
+func esTest() {
+	es, err := elasticsearch.NewDefaultClient()
+	if err != nil {
+		log.Fatalf("Error creating the client: %s", err)
+	}
+
+	res, err := es.Info()
+	if err != nil {
+		log.Fatalf("Error getting response: %s", err)
+	}
+
+	defer res.Body.Close()
+	log.Println(res)
+	// io.Copy(io.Discard, res.Body)
 }

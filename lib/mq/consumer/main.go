@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-09 14:25:30
- * @LastEditTime: 2023-02-09 15:13:06
+ * @LastEditTime: 2023-02-10 10:17:37
  */
 package main
 
@@ -16,7 +16,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-// 消费者
+// 消费者，先新启动
 func main() {
 	forever := make(chan bool)
 
