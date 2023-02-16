@@ -235,7 +235,7 @@ func DeleteDocumentsByQuery(index string, queryBody string) (err error) {
 // from 从0开始，size最多10000
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/master/search-search.html
-func SearchDocuments(index string, queryBody string, sorts []string, from, size int) (docments []ResponseRecord, total int64, err error) {
+func SearchDocuments(index string, queryBody string, sorts []string, from, size int) (docments []*ResponseRecord, total int64, err error) {
 	var res *esapi.Response
 	if res, err = GetEsClient().Search(
 		GetEsClient().Search.WithIndex(index),
