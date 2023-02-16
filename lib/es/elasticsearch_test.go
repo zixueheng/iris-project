@@ -74,11 +74,52 @@ func TestUpdateDocument(t *testing.T) {
 	}
 }
 
+func TestUpdateDocumentsByQuery(t *testing.T) {
+	var queryBody = `{
+		"script": {
+			"source": "ctx._source.name=params.name",
+			"params": {
+				"name":"newName"
+			}
+		},
+		"query": {
+			"term": {
+				"email": "fff@qq.com"
+			}
+		}
+	}`
+	if err := UpdateDocumentsByQuery("index-test", queryBody); err != nil {
+		t.Error(err.Error())
+	} else {
+		t.Log("Update Documents ok")
+	}
+}
+
 func TestDeleteDocument(t *testing.T) {
 	if err := DeleteDocument("index-test", "sC40T4YBcjhCCtcaHxK1"); err != nil {
 		t.Error(err.Error())
 	} else {
-		t.Log("delete ok")
+		t.Log("Delete ok")
+	}
+}
+
+func TestDeleteDocumentsByQuery(t *testing.T) {
+	// var queryBody = `{
+	// 	"query":{
+	// 		"match_all":{}
+	// 	}
+	// }`
+	var queryBody = `{
+		"query":{
+			"match":{
+				"age": 30
+			}
+		}
+	}`
+	if err := DeleteDocumentsByQuery("index-test", queryBody); err != nil {
+		t.Error(err.Error())
+	} else {
+		t.Log("Delete Documents ok")
 	}
 }
 

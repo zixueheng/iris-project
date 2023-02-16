@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-11 10:30:51
- * @LastEditTime: 2023-02-16 11:14:53
+ * @LastEditTime: 2023-02-16 14:34:26
  */
 package es
 
@@ -177,6 +177,22 @@ func UpdateDocument(index string, id, document string) (err error) {
 	return checkResponse(res)
 }
 
+// 指定条件更新文档（POST /<index>/_update_by_query）
+//
+// https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update-by-query.html
+func UpdateDocumentsByQuery(index string, queryBody string) (err error) {
+	var res *esapi.Response
+	if res, err = GetEsClient().UpdateByQuery(
+		[]string{index},
+		GetEsClient().UpdateByQuery.WithBody(strings.NewReader(queryBody)),
+		GetEsClient().UpdateByQuery.WithRefresh(true),
+	); err != nil {
+		return
+	}
+
+	return checkResponse(res)
+}
+
 // 删除文档（DELETE /<index>/_doc/<_id>）
 //
 // id 必传，id已存在会报错
@@ -189,6 +205,7 @@ func DeleteDocument(index string, id string) (err error) {
 	var res *esapi.Response
 	if res, err = GetEsClient().Delete(index,
 		id,
+		GetEsClient().Delete.WithRefresh("true"),
 	); err != nil {
 		return
 	}
@@ -196,29 +213,21 @@ func DeleteDocument(index string, id string) (err error) {
 	return checkResponse(res)
 }
 
-type (
-	ResponseSearch struct {
-		Took     int64          `json:"took"`
-		TimedOut bool           `json:"timed_out"`
-		Shards   ResponseShards `json:"_shards"`
-		Hits     ResponseHits   `json:"hits"`
+// 指定条件删除文档（POST /<index>/_delete_by_query）
+//
+// https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-delete-by-query.html
+func DeleteDocumentsByQuery(index string, queryBody string) (err error) {
+	var res *esapi.Response
+	if res, err = GetEsClient().DeleteByQuery(
+		[]string{index},
+		strings.NewReader(queryBody),
+		GetEsClient().DeleteByQuery.WithRefresh(true),
+	); err != nil {
+		return
 	}
-	ResponseShards struct{}
-	ResponseHits   struct {
-		Total    ResponseTotal    `json:"total"`
-		MaxScore interface{}      `json:"max_score"`
-		Hits     []ResponseRecord `json:"hits"`
-	}
-	ResponseTotal struct {
-		Value    int64  `json:"value"`
-		Relation string `json:"relation"`
-	}
-	ResponseRecord struct {
-		Index  string      `json:"_index"`
-		ID     string      `json:"_id"`
-		Source interface{} `json:"_source"`
-	}
-)
+
+	return checkResponse(res)
+}
 
 // 搜索文档（POST /<index>/_search/）
 //
