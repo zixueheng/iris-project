@@ -4,12 +4,24 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-11 15:33:22
- * @LastEditTime: 2023-02-11 17:11:33
+ * @LastEditTime: 2023-02-14 14:10:25
 -->
 # ElasticSearch API
 ## 索引
 创建索引shopping
 http://127.0.0.1:9200/shopping PUT
+可定义Mapping，如：
+```json
+{
+  "mappings": {
+    "properties": {
+      "age":    { "type": "integer" },  
+      "email":  { "type": "keyword"  }, 
+      "name":   { "type": "text"  }     
+    }
+  }
+}
+```
 
 查询索引
 http://127.0.0.1:9200/shopping GET 

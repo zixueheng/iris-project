@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   mysql:
+    container_name: mysql8
     image: mysql:8.0
     restart: always
     ports:
@@ -8,7 +9,6 @@ services:
     networks:
       - iris-project-app-network
     privileged: true
-    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: '123456'
       MYSQL_DATABASE: iris-project-app
@@ -17,6 +17,7 @@ services:
     volumes:
       - mysql-volume:/var/lib/mysql
   redis:
+    container_name: redis7
     image: redis:7.0
     restart: always
     ports:
@@ -26,10 +27,23 @@ services:
     privileged: true
     environment:
       - "TZ=Asia/Shanghai"
-    container_name: redis
     volumes:
       - redis-volume:/data
     command: redis-server --requirepass 123 --appendonly yes
+  elasticsearch:
+    container_name: es8
+    image: elasticsearch:8.6.1
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    networks:
+      - iris-project-app-network
+    volumes:
+      - elastic-volume:/usr/share/elasticsearch/data
   iris-project-app:
     # 使用dockerfile编译 有问题 
     # build:
@@ -50,6 +64,7 @@ services:
     depends_on:
       - mysql
       - redis
+      - elasticsearch
 networks:
   iris-project-app-network:
     driver: bridge
@@ -57,3 +72,4 @@ volumes:
   iris-project-app-volume:
   mysql-volume:
   redis-volume:
+  elastic-volume:
