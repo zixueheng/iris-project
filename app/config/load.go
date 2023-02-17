@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-01 16:15:07
- * @LastEditTime: 2023-02-14 15:02:57
+ * @LastEditTime: 2023-02-17 15:16:53
  */
 package config
 
@@ -168,7 +168,7 @@ var (
 
 func init() {
 	rootpath, _ := os.Getwd()
-	rootpath = "D:/go-projects/iris-project/"
+	// rootpath = "D:/go-projects/iris-project/"
 	// fmt.Println(rootpath)
 	if err := configor.New(&configor.Config{Debug: false}).Load(&App, filepath.Join(rootpath, "config/app.yml")); err != nil {
 		panic(err)

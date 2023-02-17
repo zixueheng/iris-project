@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-11 15:33:22
- * @LastEditTime: 2023-02-14 14:10:25
+ * @LastEditTime: 2023-02-17 10:24:33
 -->
 # ElasticSearch API
 ## 索引
@@ -94,8 +94,22 @@ http://127.0.0.1:9200/shopping/_search
 ```json
 {
 	"query":{
-		"match":{
-			"category":"小米" // 查询的字段
+        // https://www.elastic.co/guide/en/elasticsearch/reference/master/query-dsl-match-query.html
+		"match":{ // 主要用于text 类型字段查询，会分词后再执行查询
+			"category":"小米 小红" // 查询的字段
+		}
+        // "match": {
+        //     "message": {
+        //         "query": "小米 小红",
+        //         "operator": "and" // 分词后执行的是and，即包含小米也包含小红，默认是or
+        //     }
+        // }
+	},
+
+    "query":{
+        // https://www.elastic.co/guide/en/elasticsearch/reference/master/query-dsl-term-query.html
+		"term":{ // 主要用于非 text 类型字段查询（适合keyword类型），完全匹配，不分词（如果用于text字段查询可能返回没有结果）
+			"username": "xiaomi" // 查询的字段
 		}
 	},
 

@@ -62,12 +62,12 @@ func TestGetDocument(t *testing.T) {
 func TestUpdateDocument(t *testing.T) {
 	var document = `{
 		"doc": {
-			"age": 31,
-			"email":"4444@qq.com",
-			"name": "小明aa"
+			"age": 20,
+			"email": "qqqq@qq.com",
+			"name": "小胡"
 		}
 	}`
-	if err := UpdateDocument("index-test", "2", document); err != nil {
+	if err := UpdateDocument("index-test", "9", document); err != nil {
 		t.Error(err.Error())
 	} else {
 		t.Log("update ok")
@@ -139,6 +139,9 @@ func TestSearchDocuments(t *testing.T) {
 	if list, total, err := SearchDocuments("index-test", queryBody, []string{"age:desc"}, 0, 2); err != nil {
 		t.Error(err.Error())
 	} else {
-		t.Log("Search Documents: ", total, list)
+		t.Log("Search Documents: ", total)
+		for _, v := range list {
+			t.Logf("%+v", v)
+		}
 	}
 }

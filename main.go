@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-02-01 16:08:22
+ * @LastEditTime: 2023-02-17 16:57:36
  */
 package main
 
@@ -27,41 +27,16 @@ import (
 
 // windows编译 go build -ldflags "-s -w -H=windowsgui" -o=iris-project-daemon.exe
 func main() {
-	// ac := makeAccessLog() // 请求访问日志
-	// defer ac.Close() // Close the underline file.
-
 	app := NewApp()
 
-	app.Logger().SetLevel(config.App.LogLevel)
+	// file := NewLogFile()
+	// defer file.Close()
+	// app.Logger().SetOutput(io.MultiWriter(file, os.Stdout)) // 也可以同时输出到多个地方
 
-	file := NewLogFile()
-	defer file.Close()
-	// app.Logger().SetOutput(file) // 这里可以设置日志输出的地方 文件 或控制台 或 其他的地方
-	app.Logger().SetOutput(io.MultiWriter(file, os.Stdout)) // 也可以同时输出到多个地方
-
+	// ac := makeAccessLog() // 请求访问日志
+	// defer ac.Close() // Close the underline file.
 	// Register the middleware (UseRouter to catch http errors too).
 	// app.UseRouter(ac.Handler)
-
-	// 使用日志中间件
-	app.Use(logger.New(logger.Config{
-		// Status displays status code
-		Status: true,
-		// IP displays request's remote address
-		IP: true,
-		// Method displays the http method
-		Method: true,
-		// Path displays the request path
-		Path: true,
-		// Query appends the url query to the Path.
-		Query: true,
-
-		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
-		// will be added to the logs.
-		// MessageContextKeys: []string{"logger_message"},
-
-		// if !empty then its contents derives from `ctx.GetHeader("User-Agent")
-		// MessageHeaderKeys: []string{"User-Agent"},
-	}))
 
 	routes.InitRoute(app) // 加载路由
 	// app.Listen(":8080")
@@ -89,6 +64,33 @@ func NewApp() *iris.Application {
 	app := iris.New() // 返回全新的 *iris.Application 实例
 
 	app.Use(recover.New()) // Recover 会从paincs中恢复并返回 500 错误码
+
+	app.Logger().SetLevel(config.App.LogLevel)
+	app.Logger().SetTimeFormat(config.App.Timeformat)
+	app.Logger().SetOutput(io.MultiWriter(os.Stdout))
+
+	// 使用http请求日志中间件，注意专门输出请求日志
+	// 输出信息如：
+	// [INFO] 2023-02-17 16:48:43 200 11.4412ms 127.0.0.1 GET /wapapi/home
+	app.Use(logger.New(logger.Config{
+		// Status displays status code
+		Status: true,
+		// IP displays request's remote address
+		IP: true,
+		// Method displays the http method
+		Method: true,
+		// Path displays the request path
+		Path: true,
+		// Query appends the url query to the Path.
+		Query: true,
+
+		// if !empty then its contents derives from `ctx.Values().Get("logger_message")
+		// will be added to the logs.
+		// MessageContextKeys: []string{"logger_message"},
+
+		// if !empty then its contents derives from `ctx.GetHeader("User-Agent")
+		// MessageHeaderKeys: []string{"User-Agent"},
+	}))
 
 	// 建议：使用Web服务器 服务静态文件
 	// app.HandleDir("/static", "./assets", iris.DirOptions{ShowList: true, Gzip: true})
@@ -123,7 +125,7 @@ func makeAccessLog() *accesslog.AccessLog {
 
 	// The default configuration:
 	ac.Delim = '|'
-	ac.TimeFormat = "2006-01-02 15:04:05"
+	ac.TimeFormat = config.App.Timeformat
 	ac.Async = false
 	ac.IP = true
 	ac.BytesReceivedBody = true

@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-11 10:30:51
- * @LastEditTime: 2023-02-16 14:34:26
+ * @LastEditTime: 2023-02-17 14:21:15
  */
 package es
 
@@ -12,9 +12,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
-	"io/ioutil"
 	"iris-project/global"
 	"log"
 	"strings"
@@ -28,7 +25,11 @@ func GetEsClient() *elasticsearch.Client {
 	return global.EsClient
 }
 
-func checkResponse(res *esapi.Response) error {
+// 检查响应，返回错误，如果后续不需要使用响应则应该关闭它
+func checkResponse(res *esapi.Response, closeBody bool) error {
+	if closeBody {
+		defer res.Body.Close()
+	}
 	if res.IsError() {
 		log.Println(res.Status())
 		// log.Printf("RES: %+v", res)
@@ -41,36 +42,18 @@ func checkResponse(res *esapi.Response) error {
 	return nil
 }
 
+// 返回Body内容
 func getResponse(res *esapi.Response) string {
 	var (
 		out = new(bytes.Buffer)
-		b1  = bytes.NewBuffer([]byte{})
-		b2  = bytes.NewBuffer([]byte{})
-		tr  io.Reader
 	)
 
 	if res != nil && res.Body != nil {
-		tr = io.TeeReader(res.Body, b1)
 		defer res.Body.Close()
-
-		if _, err := io.Copy(b2, tr); err != nil {
-			out.WriteString(fmt.Sprintf("<error reading response body: %v>", err))
+		if _, err := out.ReadFrom(res.Body); err != nil {
+			out.WriteString("")
 			return out.String()
 		}
-		defer func() { res.Body = ioutil.NopCloser(b1) }()
-	}
-
-	// if res != nil {
-	// 	out.WriteString(fmt.Sprintf("[%d %s]", res.StatusCode, http.StatusText(r.StatusCode)))
-	// 	if res.StatusCode > 0 {
-	// 		out.WriteRune(' ')
-	// 	}
-	// } else {
-	// 	out.WriteString("[0 <nil>]")
-	// }
-
-	if res != nil && res.Body != nil {
-		out.ReadFrom(b2) // errcheck exclude (*bytes.Buffer).ReadFrom
 	}
 
 	return out.String()
@@ -91,7 +74,7 @@ func CreateIndex(index, mapping string) (err error) {
 		return
 	}
 
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 创建修改文档（POST/PUT /<index>/_doc/<_id>）
@@ -110,7 +93,7 @@ func CreateUpdateDocument(index string, id, document string) (err error) {
 	); err != nil {
 		return
 	}
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 创建文档（PUT /<index>/_create/id）
@@ -131,7 +114,7 @@ func CreateDocument(index string, id, document string) (err error) {
 		return
 	}
 
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 获取文档（GET /<index>/_source/<_id>）
@@ -150,7 +133,7 @@ func GetDocument(index string, id string) (document string, err error) {
 		return
 	}
 
-	if err = checkResponse(res); err != nil {
+	if err = checkResponse(res, false); err != nil {
 		return
 	}
 
@@ -174,7 +157,7 @@ func UpdateDocument(index string, id, document string) (err error) {
 	); err != nil {
 		return
 	}
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 指定条件更新文档（POST /<index>/_update_by_query）
@@ -190,7 +173,7 @@ func UpdateDocumentsByQuery(index string, queryBody string) (err error) {
 		return
 	}
 
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 删除文档（DELETE /<index>/_doc/<_id>）
@@ -210,7 +193,7 @@ func DeleteDocument(index string, id string) (err error) {
 		return
 	}
 
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 指定条件删除文档（POST /<index>/_delete_by_query）
@@ -226,7 +209,7 @@ func DeleteDocumentsByQuery(index string, queryBody string) (err error) {
 		return
 	}
 
-	return checkResponse(res)
+	return checkResponse(res, true)
 }
 
 // 搜索文档（POST /<index>/_search/）
@@ -248,7 +231,7 @@ func SearchDocuments(index string, queryBody string, sorts []string, from, size 
 		return
 	}
 
-	if err = checkResponse(res); err != nil {
+	if err = checkResponse(res, false); err != nil {
 		return
 	}
 
