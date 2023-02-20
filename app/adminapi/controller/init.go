@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-08 14:17:15
- * @LastEditTime: 2022-10-31 14:14:49
+ * @LastEditTime: 2023-02-20 15:30:59
  */
 package controller
 
@@ -33,7 +33,7 @@ func (p *Public) GetInit() string {
 		// &adminmodel.AdminUserRole{},
 		// &adminmodel.RoleMenu{},
 	)
-	return "ok"
+	// return "ok"
 	if err != nil {
 		fmt.Println(err.Error())
 	}

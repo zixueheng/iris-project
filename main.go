@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-02-17 16:57:36
+ * @LastEditTime: 2023-02-20 14:04:29
  */
 package main
 
@@ -17,10 +17,10 @@ import (
 	"iris-project/app/config"
 	"iris-project/global"
 	"iris-project/lib/file"
+	"iris-project/middleware"
 	"iris-project/routes"
 
 	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/middleware/accesslog"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
 )
@@ -33,10 +33,10 @@ func main() {
 	// defer file.Close()
 	// app.Logger().SetOutput(io.MultiWriter(file, os.Stdout)) // 也可以同时输出到多个地方
 
-	// ac := makeAccessLog() // 请求访问日志
-	// defer ac.Close() // Close the underline file.
+	ac := middleware.MakeAccessLog() // 请求访问日志
+	defer ac.Close()                 // Close the underline file.
 	// Register the middleware (UseRouter to catch http errors too).
-	// app.UseRouter(ac.Handler)
+	app.UseRouter(ac.Handler)
 
 	routes.InitRoute(app) // 加载路由
 	// app.Listen(":8080")
@@ -114,40 +114,4 @@ func NewLogFile() *os.File {
 	}
 
 	return f
-}
-
-// 创建访问日志
-func makeAccessLog() *accesslog.AccessLog {
-	// Initialize a new access log middleware.
-	ac := accesslog.File("./access.log")
-	// Remove this line to disable logging to console:
-	ac.AddOutput(os.Stdout)
-
-	// The default configuration:
-	ac.Delim = '|'
-	ac.TimeFormat = config.App.Timeformat
-	ac.Async = false
-	ac.IP = true
-	ac.BytesReceivedBody = true
-	ac.BytesSentBody = true
-	ac.BytesReceived = false
-	ac.BytesSent = false
-	ac.BodyMinify = true
-	ac.RequestBody = true
-	ac.ResponseBody = true
-	ac.KeepMultiLineError = true
-	ac.PanicLog = accesslog.LogHandler
-
-	// Default line format if formatter is missing:
-	// Time|Latency|Code|Method|Path|IP|Path Params Query Fields|Bytes Received|Bytes Sent|Request|Response|
-	//
-	// Set Custom Formatter:
-	ac.SetFormatter(&accesslog.JSON{
-		Indent:    "  ",
-		HumanTime: true,
-	})
-	// ac.SetFormatter(&accesslog.CSV{})
-	// ac.SetFormatter(&accesslog.Template{Text: "{{.Code}}"})
-
-	return ac
 }

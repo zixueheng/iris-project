@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-11 10:30:51
- * @LastEditTime: 2023-02-17 14:21:15
+ * @LastEditTime: 2023-02-20 15:34:25
  */
 package es
 
@@ -31,7 +31,7 @@ func checkResponse(res *esapi.Response, closeBody bool) error {
 		defer res.Body.Close()
 	}
 	if res.IsError() {
-		log.Println(res.Status())
+		log.Println("Elasticsearch: ", res.Status())
 		// log.Printf("RES: %+v", res)
 		// var bytes []byte
 		// if _, err := res.Body.Read(bytes); err != nil {
@@ -57,6 +57,26 @@ func getResponse(res *esapi.Response) string {
 	}
 
 	return out.String()
+}
+
+// IndexExist 检查Index是否存在，true存在、false不存在
+//
+// https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
+func IndexExist(index string) bool {
+	var (
+		res *esapi.Response
+		err error
+	)
+	if res, err = GetEsClient().Indices.Exists(
+		[]string{index},
+	); err != nil {
+		return false
+	}
+	if checkResponse(res, true) == nil {
+		return true
+	}
+
+	return false
 }
 
 // CreateIndex 创建索引
