@@ -29,7 +29,7 @@ const (
 
 	/*
 		// StaffJWTKey 员工端JWT荷载playload中要保存的键名
-		StaffJWTKey = "staff_id"
+		StaffJWTKey = UserID // "staff_id"
 		// StaffTokenMinutes 员工Token有效期/分钟
 		StaffTokenMinutes = 12 * 60
 		// StaffRefreshTokenMinutes 员工RefreshToken 有效期/分钟

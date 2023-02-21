@@ -104,7 +104,10 @@ func (logWriter *HttpLogWriter) Write(p []byte) (n int, err error) {
 	// 当前只记录admin的请求日志
 	if !util.InArray(
 		customLog.Fields.GetString(global.ClientKey),
-		[]string{global.GetClient(global.AdminAPI), global.GetClient(global.WapAPI)},
+		[]string{
+			global.GetClient(global.AdminAPI),
+			/*global.GetClient(global.WapAPI),*/
+		},
 	) {
 		return 0, nil
 	}
@@ -118,8 +121,6 @@ func (logWriter *HttpLogWriter) Write(p []byte) (n int, err error) {
 		log.Println(err.Error())
 		return 0, nil
 	}
-
-	// log.Println("请求111", string(byts))
 
 	if err = es.CreateUpdateDocument(HttpLogIndexName, "", string(bytes)); err != nil {
 		// log.Panic(err.Error())

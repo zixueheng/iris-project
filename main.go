@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-02-21 10:13:24
+ * @LastEditTime: 2023-02-21 14:50:45
  */
 package main
 
@@ -64,6 +64,7 @@ func newApp() *iris.Application {
 	app := iris.New() // 返回全新的 *iris.Application 实例
 
 	app.Use(recover.New()) // Recover 会从paincs中恢复并返回 500 错误码
+	// app.Use(iris.Compression) // 开启gzip压缩，会消耗一定CPU资源，一般不压缩或通过nginx压缩
 
 	app.Logger().SetLevel(config.App.LogLevel)
 	app.Logger().SetTimeFormat(config.App.Timeformat)

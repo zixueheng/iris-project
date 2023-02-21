@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-07-21 14:51:34
- * @LastEditTime: 2022-11-02 14:59:17
+ * @LastEditTime: 2023-02-21 16:34:18
  */
 package main
 
@@ -36,7 +36,7 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	if _, err := checkCron.AddFunc("@daily", DeleteOldFiles); err != nil { // 每天清除旧文件
+	if _, err := checkCron.AddFunc("@daily", deleteOldFiles); err != nil { // 每天清除旧文件
 		log.Println(err.Error())
 	}
 
@@ -74,7 +74,7 @@ func backDB() {
 	}
 }
 
-func DeleteOldFiles() {
+func deleteOldFiles() {
 	rootpath, _ := os.Getwd()
 	rd, err := ioutil.ReadDir(rootpath + "/db-backup/sql-file/")
 	if err != nil {
