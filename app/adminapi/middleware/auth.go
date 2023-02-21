@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:28:08
- * @LastEditTime: 2022-11-15 14:34:56
+ * @LastEditTime: 2023-02-21 10:57:28
  */
 package middleware
 
@@ -38,6 +38,10 @@ func Auth(ctx iris.Context) {
 		adminUseID = value.(string)
 	} else {
 		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有"+global.AdminUserJWTKey))
+	}
+
+	if value, ok := data[global.ClientKey]; !ok || value != global.GetClient(global.AdminAPI) {
+		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("非法client访问"))
 	}
 
 	if value, ok := data["exp"]; ok {

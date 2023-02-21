@@ -39,7 +39,9 @@ func MerchantLogin(username, password string) (interface{}, bool, app.Code) {
 
 // GetMerchantTokenInfo 生成token
 func GetMerchantTokenInfo(merchant *model.Merchant) interface{} {
-	token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.MerchantJWTKey, int(merchant.ID), global.MerchantTokenMinutes, global.MerchantRefreshTokenMinutes)
+	token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.MerchantJWTKey, int(merchant.ID), global.MerchantTokenMinutes,
+		global.MerchantRefreshTokenMinutes,
+		global.GetClient(global.MerchantAPI))
 	// 不处理刷新token了
 	res := struct {
 		Token               string          `json:"token"`

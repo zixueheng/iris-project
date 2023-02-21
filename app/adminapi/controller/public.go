@@ -146,7 +146,9 @@ func (p *Public) PostRefreshtoken() {
 		return
 	}
 
-	token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, int(adminUser.ID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
+	token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, int(adminUser.ID), global.AdminTokenMinutes,
+		global.AdminRefreshTokenMinutes,
+		global.GetClient(global.AdminAPI))
 	dao.UpdateByID(adminUser, map[string]interface{}{"refresh_token": refreshToken, "refresh_token_expired": refreshTokenExpired.Unix()}) // 保存刷新token和过期时间至数据库
 	response := struct {
 		Token               string `json:"token"`

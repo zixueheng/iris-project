@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-02-20 14:04:29
+ * @LastEditTime: 2023-02-21 10:13:24
  */
 package main
 
@@ -27,7 +27,7 @@ import (
 
 // windows编译 go build -ldflags "-s -w -H=windowsgui" -o=iris-project-daemon.exe
 func main() {
-	app := NewApp()
+	app := newApp()
 
 	// file := NewLogFile()
 	// defer file.Close()
@@ -59,8 +59,8 @@ func main() {
 	}
 }
 
-// NewApp 创建 iris 实例
-func NewApp() *iris.Application {
+// newApp 创建 iris 实例
+func newApp() *iris.Application {
 	app := iris.New() // 返回全新的 *iris.Application 实例
 
 	app.Use(recover.New()) // Recover 会从paincs中恢复并返回 500 错误码
@@ -103,8 +103,8 @@ func NewApp() *iris.Application {
 	return app
 }
 
-// NewLogFile 创建日志文件
-func NewLogFile() *os.File {
+// newLogFile 创建日志文件
+func newLogFile() *os.File {
 	path := "./logs/"
 	_ = file.CreateFile(path)
 	filename := path + time.Now().Format("2006-01-02") + ".log"

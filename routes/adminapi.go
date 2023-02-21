@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2022-10-31 14:15:09
+ * @LastEditTime: 2023-02-21 09:48:35
  */
 package routes
 
@@ -14,12 +14,13 @@ import (
 
 	"iris-project/app/adminapi/controller"
 	adminapimiddleware "iris-project/app/adminapi/middleware"
+	"iris-project/global"
 	"iris-project/middleware"
 )
 
 // InitAdminAPI 初始化 AdminApi 模块路由
 func InitAdminAPI(app iris.Party) {
-	party := app.Party("/adminapi", middleware.CrsAuth()).AllowMethods(iris.MethodOptions)
+	party := app.Party(global.AdminAPI, middleware.CrsAuth()).AllowMethods(iris.MethodOptions)
 	// {
 	// 	adminParty.Get("/login", controller.Login)
 	// }

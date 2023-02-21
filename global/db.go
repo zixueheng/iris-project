@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2022-05-05 16:07:08
+ * @LastEditTime: 2023-02-21 09:56:56
  */
 package global
 
@@ -65,7 +65,7 @@ func init() {
 	if err != nil {
 		for {
 			time.Sleep(60 * time.Second) // 等待60秒再次连接
-			log.Println("再次连接数据库")
+			log.Println("再次连接mysql")
 			Db, err = gorm.Open(master, cfg)
 			if err == nil {
 				break

@@ -94,7 +94,9 @@ func UserPhoneLoginRegister(loginInfo *validate.UserphoneLoginRegister) (interfa
 
 // GetUserTokenInfo 生成token
 func GetUserTokenInfo(user *model.User) interface{} {
-	token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.WapUserJWTKey, int(user.ID), global.UserTokenMinutes, global.UserRefreshTokenMinutes)
+	token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.WapUserJWTKey, int(user.ID), global.UserTokenMinutes,
+		global.UserRefreshTokenMinutes,
+		global.GetClient(global.WapAPI))
 
 	dao.DeleteAll(nil, &model.UserRefreshToken{}, map[string]interface{}{"refresh_token_expired <": time.Now().Unix()})                             // 删除过期的
 	dao.SaveOne(nil, &model.UserRefreshToken{UserID: user.ID, RefreshToken: refreshToken, RefreshTokenExpired: uint32(refreshTokenExpired.Unix())}) // 保存刷新token和过期时间

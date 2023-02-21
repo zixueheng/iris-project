@@ -14,12 +14,13 @@ import (
 
 	"iris-project/app/wapapi/controller"
 	wapapimiddleware "iris-project/app/wapapi/middleware"
+	"iris-project/global"
 	"iris-project/middleware"
 )
 
 // InitWapAPI 初始化 WapApi 模块路由
 func InitWapAPI(app iris.Party) {
-	party := app.Party("/wapapi", middleware.CrsAuth(), middleware.Sentinel()).AllowMethods(iris.MethodOptions)
+	party := app.Party(global.WapAPI, middleware.CrsAuth(), middleware.Sentinel()).AllowMethods(iris.MethodOptions)
 	mvc.Configure(party, loadWapAPIController)
 }
 

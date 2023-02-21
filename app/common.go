@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2022-10-26 15:22:50
+ * @LastEditTime: 2023-02-21 10:50:30
  */
 package app
 
@@ -78,49 +78,22 @@ func ValidateStruct(obj interface{}) string {
 	return errmsg
 }
 
-// GenTokenAndRefreshToken 生成Token和RefreshToken
-//
-// key JWT要保存的键名，cacheKeyPrefix 缓存key前缀，id 键值，
-// tokenMinutes Token多少分钟后过期，refreshTokenMinutes 刷新Token多少分钟后过期
-// func GenTokenAndRefreshToken(key, cacheKeyPrefix string, id int, tokenMinutes, refreshTokenMinutes int) (string, string) {
-// 	var now = time.Now()
-// 	var tokenExpired = now.Add(time.Minute * time.Duration(tokenMinutes))
-// 	// var refreshTokenExpired = now.Add(time.Minute * time.Duration(10))
-
-// 	// 获取一个 Token，参数一：签名方法、参数二：要保存的数据
-// 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-// 		key:   util.ParseString(id),
-// 		"exp": util.TimeFormat(tokenExpired, ""),
-// 		"iat": util.TimeFormat(now, ""),
-// 	})
-
-// 	// Sign and get the complete encoded token as a string using the secret
-// 	tokenString, _ := token.SignedString([]byte(config.App.Jwtsecret))
-
-// 	refreshToken := util.GetRandomString(64)
-
-// 	// 保存刷新token到Redis中
-// 	err := global.Redis.Set(config.App.Appname+cacheKeyPrefix+util.ParseString(id), refreshToken, time.Minute*time.Duration(refreshTokenMinutes)).Err()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return tokenString, refreshToken
-// }
-
 // GenTokenAndRefreshToken 生成Token和RefreshToken，并返回Token和RefreshToken的过期时间
 //
 // key JWT要保存的键名，id 键值，
 // tokenMinutes Token多少分钟后过期，
 // refreshTokenMinutes 刷新Token多少分钟后过期
-func GenTokenAndRefreshToken(key string, id int, tokenMinutes, refreshTokenMinutes int) (token, refreshToken string, tokenExpired, refreshTokenExpired time.Time) {
+// client 端
+func GenTokenAndRefreshToken(key string, id int, tokenMinutes, refreshTokenMinutes int, client string) (token, refreshToken string, tokenExpired, refreshTokenExpired time.Time) {
 	var now = time.Now()
 	tokenExpired = now.Add(time.Minute * time.Duration(tokenMinutes))
 
 	// 获取一个 Token，参数一：签名方法、参数二：要保存的数据
 	tokenObj := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		key:   util.ParseString(id),
-		"exp": util.TimeFormat(tokenExpired, ""),
-		"iat": util.TimeFormat(now, ""),
+		key:              util.ParseString(id),
+		global.ClientKey: client,
+		"exp":            util.TimeFormat(tokenExpired, ""),
+		"iat":            util.TimeFormat(now, ""),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret

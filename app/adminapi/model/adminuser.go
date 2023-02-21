@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2023-02-01 15:58:27
+ * @LastEditTime: 2023-02-21 10:53:25
  */
 package model
 
@@ -67,7 +67,9 @@ func (au *AdminUser) CheckLogin(loginInfo *validate.LoginRequest) (interface{}, 
 		return nil, false, app.CodeUserForbidden
 	} else {
 		if bcrypt.Match(loginInfo.Password, au.Password) {
-			token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, int(au.ID), global.AdminTokenMinutes, global.AdminRefreshTokenMinutes)
+			token, refreshToken, tokenExpired, refreshTokenExpired := app.GenTokenAndRefreshToken(global.AdminUserJWTKey, int(au.ID), global.AdminTokenMinutes,
+				global.AdminRefreshTokenMinutes,
+				global.GetClient(global.AdminAPI))
 
 			au.GetOne(true)
 			dao.UpdateByID(au, map[string]interface{}{"refresh_token": refreshToken, "refresh_token_expired": refreshTokenExpired.Unix()}) // 保存刷新token和过期时间至数据库

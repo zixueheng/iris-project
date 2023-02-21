@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2021-04-28 14:50:55
+ * @LastEditTime: 2023-02-21 11:10:42
  */
 package middleware
 
@@ -75,6 +75,10 @@ func Auth(ctx iris.Context) {
 	} else {
 		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有"+global.WapUserJWTKey))
 		return
+	}
+
+	if value, ok := data[global.ClientKey]; !ok || value != global.GetClient(global.WapAPI) {
+		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("非法client访问"))
 	}
 
 	if value, ok := data["exp"]; ok {

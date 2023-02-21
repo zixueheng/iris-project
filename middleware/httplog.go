@@ -78,7 +78,7 @@ func init() {
 		}
 	}`
 	if err := es.CreateIndex(HttpLogIndexName, mapping); err != nil {
-		log.Panic(err.Error())
+		log.Println(err.Error())
 	} else {
 		log.Println("create elasticsearch index: " + HttpLogIndexName + " ok")
 	}
@@ -102,11 +102,14 @@ func (logWriter *HttpLogWriter) Write(p []byte) (n int, err error) {
 		return 0, nil
 	}
 	// 当前只记录admin的请求日志
-	if !util.InArray(customLog.Fields.GetString("client"), []string{"admin"}) {
+	if !util.InArray(
+		customLog.Fields.GetString(global.ClientKey),
+		[]string{global.GetClient(global.AdminAPI), global.GetClient(global.WapAPI)},
+	) {
 		return 0, nil
 	}
-	customLog.Client = customLog.Fields.GetString("client")
-	customLog.UserID = customLog.Fields.GetString("user_id")
+	customLog.Client = customLog.Fields.GetString(global.ClientKey)
+	customLog.UserID = customLog.Fields.GetString(global.UserID)
 	customLog.Params = customLog.Fields.GetString("params")
 	customLog.Fields = nil
 
@@ -153,39 +156,23 @@ func MakeAccessLog() *accesslog.AccessLog {
 
 	ac.AddFields(func(ctx iris.Context, fields *accesslog.Fields) {
 		fields.Set("params", ctx.Request().URL.RawQuery)
+		fields.Set(global.ClientKey, "")
+		fields.Set(global.UserID, "")
+
+		for api, client := range global.ClientMap {
+			if strings.HasPrefix(ctx.Path(), api) {
+				fields.Set(global.ClientKey, client)
+				break
+			}
+		}
 
 		if ctx.Values().Get("jwt") != nil {
 			value := ctx.Values().Get("jwt").(*jwt.Token)
 			data := value.Claims.(jwt.MapClaims)
 
-			if value, ok := data[global.AdminUserJWTKey]; ok {
-				fields.Set("client", "admin")
-				fields.Set("user_id", value.(string))
+			if value, ok := data[global.UserID]; ok {
+				fields.Set(global.UserID, value.(string))
 			}
-
-			if value, ok := data[global.WapUserJWTKey]; ok {
-				fields.Set("client", "wap")
-				fields.Set("user_id", value.(string))
-			}
-
-			if value, ok := data[global.StaffJWTKey]; ok {
-				fields.Set("client", "staff")
-				fields.Set("user_id", value.(string))
-			}
-
-			if value, ok := data[global.MerchantJWTKey]; ok {
-				fields.Set("client", "merchant")
-				fields.Set("user_id", value.(string))
-			}
-
-			// TODO: 更多端填充中。。。
-
-		} else {
-			if strings.Contains(ctx.Path(), "/adminapi") {
-				fields.Set("client", "admin")
-			}
-
-			fields.Set("user_id", "")
 		}
 
 	})
