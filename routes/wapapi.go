@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-02-02 11:11:06
+ * @LastEditTime: 2023-02-27 10:03:27
  */
 package routes
 
@@ -29,6 +29,7 @@ func loadWapAPIController(app *mvc.Application) {
 	app.Handle(new(controller.Public))
 	app.Handle(new(controller.Version))
 	app.Handle(new(controller.Home))
+	app.Handle(new(controller.Test))
 
 	app.Router.Use(middleware.JwtHandler().Serve, wapapimiddleware.Auth)
 	app.Handle(new(controller.Address))

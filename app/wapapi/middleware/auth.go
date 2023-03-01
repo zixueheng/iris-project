@@ -4,14 +4,13 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2023-02-21 11:10:42
+ * @LastEditTime: 2023-03-01 10:59:46
  */
 package middleware
 
 import (
 	"errors"
 	"iris-project/app"
-	"iris-project/app/config"
 	"iris-project/global"
 	"iris-project/lib/util"
 	"time"
@@ -69,7 +68,10 @@ func Auth(ctx iris.Context) {
 	// 	ctx.Writef("%s = %s\n", key, value)
 	// }
 
-	var userID, exp string
+	var (
+		userID string
+		exp    float64
+	)
 	if value, ok := data[global.WapUserJWTKey]; ok {
 		userID = value.(string)
 	} else {
@@ -82,19 +84,19 @@ func Auth(ctx iris.Context) {
 	}
 
 	if value, ok := data["exp"]; ok {
-		exp = value.(string)
+		exp = value.(float64)
 	} else {
 		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有exp"))
 		return
 	}
 
-	expObj, err := time.ParseInLocation(config.App.Timeformat, exp, time.Local)
-	if err != nil { // 过期时间解析错误，返回 BadRequest
-		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, err)
-		return
-	}
+	// expObj, err := time.ParseInLocation(config.App.Timeformat, exp, time.Local)
+	// if err != nil { // 过期时间解析错误，返回 BadRequest
+	// 	app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, err)
+	// 	return
+	// }
 
-	if expObj.Before(time.Now()) { // Token 超时
+	if time.Unix(int64(exp), 0).Before(time.Now()) { // Token 超时
 		ctx.JSON(app.APIData(false, app.CodeTokenExpired, "", nil))
 		ctx.StopExecution()
 		return

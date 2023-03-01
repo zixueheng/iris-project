@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2021-04-28 14:46:35
+ * @LastEditTime: 2023-02-28 14:57:58
  */
 package middleware
 
@@ -18,6 +18,7 @@ import (
 func JwtHandler() *jwt.Middleware {
 	var mySecret = []byte(config.App.Jwtsecret) // jwt验证密钥
 	return jwt.New(jwt.Config{
+		Extractor: jwt.FromAuthHeader,
 		// CredentialsOptional: false,
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			return mySecret, nil

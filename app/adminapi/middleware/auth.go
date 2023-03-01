@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:28:08
- * @LastEditTime: 2023-02-21 10:57:28
+ * @LastEditTime: 2023-03-01 10:47:04
  */
 package middleware
 
@@ -33,7 +33,10 @@ func Auth(ctx iris.Context) {
 	// 	ctx.Writef("%s = %s\n", key, value)
 	// }
 
-	var adminUseID, exp string
+	var (
+		adminUseID string
+		exp        float64
+	)
 	if value, ok := data[global.AdminUserJWTKey]; ok {
 		adminUseID = value.(string)
 	} else {
@@ -45,17 +48,12 @@ func Auth(ctx iris.Context) {
 	}
 
 	if value, ok := data["exp"]; ok {
-		exp = value.(string)
+		exp = value.(float64)
 	} else {
 		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, errors.New("Token中没有exp"))
 	}
 
-	expObj, err := time.ParseInLocation(config.App.Timeformat, exp, time.Local)
-	if err != nil { // 过期时间解析错误，返回 BadRequest
-		app.ResponseProblemHTTPCode(ctx, iris.StatusBadRequest, err)
-	}
-
-	if expObj.Before(time.Now()) { // Token 超时
+	if time.Unix(int64(exp), 0).Before(time.Now()) { // Token 超时
 		ctx.JSON(app.APIData(false, app.CodeTokenExpired, "", nil))
 		ctx.StopExecution()
 		return

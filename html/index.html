@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>websocket</title>
+    <!-- import the iris client-side library for browser from a CDN or locally.
+     However, `neffos.(min.)js` is a NPM package too so alternatively,
+     you can use it as dependency on your package.json and all nodejs-npm tooling become available:
+     see the "browserify" example for more-->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/neffos.js@latest/dist/neffos.min.js"></script> -->
+
+    <script src="//cdn.jsdelivr.net/npm/neffos.js@latest/dist/neffos-es5.js"></script>
+<body>
+   <!-- the message's input -->
+    <input id="input" type="text" />
+
+    <!-- when clicked then a websocket event will be sent to the server, at this example we registered the 'chat' -->
+    <button id="sendBtn" disabled>Send</button>
+
+    <!-- the messages will be shown here -->
+    <pre id="output"></pre>
+    
+    <script>
+        /*
+        // `neffos` global variable is available now.
+        var scheme = document.location.protocol == "https:" ? "wss" : "ws";
+        var port = document.location.port ? ":" + document.location.port : "";
+        var wsURL = scheme + "://" + document.location.hostname + port + "/echo";
+    
+        const enableJWT = true;
+        if (enableJWT) {
+            // This is just a signature and a payload of an example content, 
+            // please replace this with your logic.
+            //
+            // Add a random letter in front of the token to make it
+            // invalid and see that this client is not allowed to dial the websocket server.
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjozMjEzMjF9.8waEX7-vPKACa-Soi1pQvW3Rl8QY-SUFcHKTLZI4mvU";
+            wsURL += "?token=" + token;
+        }
+    
+        var outputTxt = document.getElementById("output");
+        function addMessage(msg) {
+            outputTxt.innerHTML += msg + "\n";
+        }
+    
+        function handleError(reason) {
+            console.log(reason);
+            window.alert("error: see the dev console");
+        }
+    
+        function handleNamespaceConnectedConn(nsConn) {
+            nsConn.emit("Hello from browser client side!");
+    
+            let inputTxt = document.getElementById("input");
+            let sendBtn = document.getElementById("sendBtn");
+    
+            sendBtn.disabled = false;
+            sendBtn.onclick = function () {
+                const input = inputTxt.value;
+                inputTxt.value = "";
+                nsConn.emit("chat", input);
+                addMessage("Me: " + input);
+            };
+        }
+    
+        const username = window.prompt("Your username?");
+        
+        async function runExample() {
+            // You can omit the "default" and simply define only Events, the namespace will be an empty string"",
+            // however if you decide to make any changes on this example make sure the changes are reflecting inside the ../server.go file as well.
+            try {
+                const conn = await neffos.dial(wsURL, {
+                    default: { // "default" namespace.
+                        _OnNamespaceConnected: function (nsConn, msg) {
+                            addMessage("connected to namespace: " + msg.Namespace);
+                            handleNamespaceConnectedConn(nsConn)
+                        },
+                        _OnNamespaceDisconnect: function (nsConn, msg) {
+                            addMessage("disconnected from namespace: " + msg.Namespace);
+                        },
+                        chat: function (nsConn, msg) { // "chat" event.
+                            addMessage(msg.Body);
+                        }
+                    }
+                },{
+                    headers: {
+                        "X-Username": username,
+                    }
+                });
+    
+                // You can either wait to conenct or just conn.connect("connect")
+                // and put the `handleNamespaceConnectedConn` inside `_OnNamespaceConnected` callback instead.
+                // const nsConn = await conn.connect("default");
+                // nsConn.emit(...); handleNamespaceConnectedConn(nsConn);
+                conn.connect("default");
+    
+            } catch (err) {
+                handleError(err);
+            }
+        }
+    
+        runExample();
+        
+    
+        // If "await" and "async" are available, use them instead^, all modern browsers support those,
+        // all of the javascript examples will be written using async/await method instead of promise then/catch callbacks.
+        // A usage example of promise then/catch follows:
+        // neffos.dial(wsURL, {
+        //     default: { // "default" namespace.
+        //         _OnNamespaceConnected: function (ns, msg) {
+        //             addMessage("connected to namespace: " + msg.Namespace);
+        //         },
+        //         _OnNamespaceDisconnect: function (ns, msg) {
+        //             addMessage("disconnected from namespace: " + msg.Namespace);
+        //         },
+        //         chat: function (ns, msg) { // "chat" event.
+        //             addMessage(msg.Body);
+        //         }
+        //     }
+        //     },{
+        //         headers: {
+        //             "X-Username": username,
+        //         }
+        // }).then(function (conn) {
+        //     conn.connect("default").then(handleNamespaceConnectedConn).catch(handleError);
+        // }).catch(handleError);
+
+        */
+    </script>
+
+    <script>
+        // `neffos` global variable is available now.
+        var scheme = document.location.protocol == "https:" ? "wss" : "ws";
+        var port = document.location.port ? ":" + document.location.port : "";
+        var wsURL = scheme + "://" + document.location.hostname + port + "/echo";
+
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjozMjEzMjF9.8waEX7-vPKACa-Soi1pQvW3Rl8QY-SUFcHKTLZI4mvU";
+        wsURL += "?token=" + token;
+
+        var outputTxt = document.getElementById("output");
+        function addMessage(msg) {
+            outputTxt.innerHTML += msg + "\n";
+        }
+
+        function handleError(reason) {
+            console.log(reason);
+            window.alert(reason);
+        }
+
+        function handleNamespaceConnectedConn(nsConn) {
+            let inputTxt = document.getElementById("input");
+            let sendBtn = document.getElementById("sendBtn");
+
+            sendBtn.disabled = false;
+            sendBtn.onclick = function () {
+                const input = inputTxt.value;
+                inputTxt.value = "";
+                nsConn.emit("chat", input);
+                addMessage("Me: " + input);
+            };
+        }
+
+        async function runExample() {
+            var events = new Object();
+            events._OnNamespaceConnected = function (nsConn, msg) {
+                if (nsConn.conn.wasReconnected()) {
+                    addMessage("re-connected after " + nsConn.conn.reconnectTries.toString() + " trie(s)");
+                }
+
+                addMessage("connected to namespace: " + msg.Namespace);
+                handleNamespaceConnectedConn(nsConn);
+            }
+
+            events._OnNamespaceDisconnect = function (nsConn, msg) {
+                addMessage("disconnected from namespace: " + msg.Namespace);
+            }
+
+            events.chat = function (nsConn, msg) { // "chat" event.
+                addMessage(msg.Body);
+            }
+
+            /* OR regiter those events as:
+                neffos.dial(wsURL, {default: {
+                    chat: function (nsConn, msg) { [...] }
+                }});
+            */
+
+            try {
+                // You can omit the "default" namespace and simply define only Events,
+                // the namespace will be an empty string"",
+                // however if you decide to make any changes on
+                // this example make sure the changes are reflecting inside the ../server.go file as well.
+                //
+                // At "wsURL" you can put the relative URL if the client and server
+                // hosted in the same address, e.g. "/echo".
+                const conn = await neffos.dial(wsURL, { default: events }, {
+                    // if > 0 then on network failures it tries to reconnect every 5 seconds, defaults to 0 (disabled).
+                    reconnect: 5000,
+                    // custom headers:
+                    headers: {
+                       'X-Username': 'heyongongiang',
+                    }
+                });
+
+                // You can either wait to conenct or just conn.connect("connect")
+                // and put the `handleNamespaceConnectedConn` inside `_OnNamespaceConnected` callback instead.
+                // const nsConn = await conn.connect("default");
+                // handleNamespaceConnectedConn(nsConn);
+                conn.connect("default");
+
+            } catch (err) {
+                handleError(err);
+            }
+        }
+
+        runExample();
+
+        // If "await" and "async" are available, use them instead^, all modern browsers support those,
+        // so all of the examples will be written using async/await method instead of promise then/catch callbacks.
+        // A usage example of promise then/catch follows:
+        // neffos.dial(wsURL, {
+        //     default: { // "default" namespace.
+        //         _OnNamespaceConnected: function (ns, msg) {
+        //             addMessage("connected to namespace: " + msg.Namespace);
+        //         },
+        //         _OnNamespaceDisconnect: function (ns, msg) {
+        //             addMessage("disconnected from namespace: " + msg.Namespace);
+        //         },
+        //         chat: function (ns, msg) { // "chat" event.
+        //             addMessage(msg.Body);
+        //         }
+        //     }
+        // }).then(function (conn) {
+        //     conn.connect("default").then(handleNamespaceConnectedConn).catch(handleError);
+        // }).catch(handleError);
+    </script>
+</body>
+</html>

@@ -28,7 +28,6 @@ func (c *Home) BeforeActivation(b mvc.BeforeActivation) {
 
 // GetHome 首页信息
 func (c *Home) GetHome() {
-	c.Ctx.Application().Logger().Info("测试LOG")
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 

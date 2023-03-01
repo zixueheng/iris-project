@@ -59,6 +59,7 @@ func NewRedisLockWithCtx(ctx context.Context, key string) *RedisLock {
 	if deadline, ok := ctx.Deadline(); ok {
 		timeout = deadline.Sub(time.Now())
 	}
+
 	rl := &RedisLock{
 		ctx:       ctx,
 		timeoutMs: int(timeout.Milliseconds()),
@@ -99,6 +100,7 @@ func (rl *RedisLock) Lock() error {
 	for {
 		select {
 		case <-rl.ctx.Done():
+			// log.Println("取消", time.Now().UnixMilli())
 			return ErrContextCancel
 		default:
 			b, err := rl.TryLock()
@@ -106,8 +108,10 @@ func (rl *RedisLock) Lock() error {
 				return err
 			}
 			if b {
+				// log.Println("成功", time.Now().UnixMilli())
 				return nil
 			}
+			// log.Println("重试", time.Now().UnixMilli())
 			time.Sleep(retryInterval)
 		}
 	}

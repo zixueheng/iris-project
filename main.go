@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-02-21 14:50:45
+ * @LastEditTime: 2023-03-01 16:23:47
  */
 package main
 
@@ -18,6 +18,7 @@ import (
 	"iris-project/global"
 	"iris-project/lib/file"
 	"iris-project/middleware"
+
 	"iris-project/routes"
 
 	"github.com/kataras/iris/v12"
@@ -38,6 +39,7 @@ func main() {
 	// Register the middleware (UseRouter to catch http errors too).
 	app.UseRouter(ac.Handler)
 
+	middleware.InitWebSocket(app)
 	routes.InitRoute(app) // 加载路由
 	// app.Listen(":8080")
 

@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2023-02-21 10:50:30
+ * @LastEditTime: 2023-03-01 10:58:49
  */
 package app
 
@@ -92,8 +92,8 @@ func GenTokenAndRefreshToken(key string, id int, tokenMinutes, refreshTokenMinut
 	tokenObj := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		key:              util.ParseString(id),
 		global.ClientKey: client,
-		"exp":            util.TimeFormat(tokenExpired, ""),
-		"iat":            util.TimeFormat(now, ""),
+		"exp":            tokenExpired.Unix(), //util.TimeFormat(tokenExpired, ""),
+		"iat":            now.Unix(),          //util.TimeFormat(now, ""),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret

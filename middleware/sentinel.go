@@ -29,7 +29,7 @@ func Sentinel() context.Handler {
 	if _, err := system.LoadRules([]*system.Rule{
 		{
 			MetricType:   system.InboundQPS,
-			TriggerCount: 1, // qps 500
+			TriggerCount: 500, // qps 500
 			Strategy:     system.BBR,
 		},
 	}); err != nil {
