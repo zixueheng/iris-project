@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-03-01 16:23:47
+ * @LastEditTime: 2023-03-02 14:43:54
  */
 package main
 
@@ -17,6 +17,7 @@ import (
 	"iris-project/app/config"
 	"iris-project/global"
 	"iris-project/lib/file"
+
 	"iris-project/middleware"
 
 	"iris-project/routes"
@@ -30,17 +31,22 @@ import (
 func main() {
 	app := newApp()
 
-	// file := NewLogFile()
-	// defer file.Close()
-	// app.Logger().SetOutput(io.MultiWriter(file, os.Stdout)) // 也可以同时输出到多个地方
+	/*
+		file := NewLogFile()
+		defer file.Close()
+		app.Logger().SetOutput(io.MultiWriter(file, os.Stdout)) // 也可以同时输出到多个地方
+	*/
 
-	ac := middleware.MakeAccessLog() // 请求访问日志
-	defer ac.Close()                 // Close the underline file.
-	// Register the middleware (UseRouter to catch http errors too).
-	app.UseRouter(ac.Handler)
+	// 请求日志和websocket有冲突，所以在routes里面单独加载此中间件
+	/*
+		ac := middleware.MakeAccessLog() // 请求访问日志
+		defer ac.Close()                 // Close the underline file.
+		// Register the middleware (UseRouter to catch http errors too).
+		app.UseRouter(ac.Handler)
+	*/
 
-	middleware.InitWebSocket(app)
-	routes.InitRoute(app) // 加载路由
+	middleware.InitWebSocket(app) // 普通方式，mvc方式查看routes
+	routes.InitRoute(app)         // 加载路由
 	// app.Listen(":8080")
 
 	if config.App.HTTPS {
@@ -101,6 +107,8 @@ func newApp() *iris.Application {
 	iris.RegisterOnInterrupt(func() {
 		sqlDb, _ := global.Db.DB()
 		sqlDb.Close()
+
+		middleware.AcLog.Close()
 	})
 
 	return app

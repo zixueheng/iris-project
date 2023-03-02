@@ -1,0 +1,6 @@
+# WebSocket
+on: true
+enablejwt: true
+endpoint: "/websocket"
+namespace: "default"
+

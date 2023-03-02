@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-01 16:15:07
- * @LastEditTime: 2023-02-17 15:16:53
+ * @LastEditTime: 2023-03-02 14:35:12
  */
 package config
 
@@ -61,6 +61,13 @@ var (
 		Addresses []string
 		Username  string
 		Password  string
+	}{}
+
+	WebSocket = struct {
+		On        bool
+		Enablejwt bool
+		Endpoint  string
+		Namespace string
 	}{}
 
 	// Jpush 极光推送
@@ -179,6 +186,10 @@ func init() {
 	}
 
 	if err := configor.New(&configor.Config{Debug: false}).Load(&ES, filepath.Join(rootpath, "config/es.yml")); err != nil {
+		panic(err)
+	}
+
+	if err := configor.New(&configor.Config{Debug: false}).Load(&WebSocket, filepath.Join(rootpath, "config/websocket.yml")); err != nil {
 		panic(err)
 	}
 

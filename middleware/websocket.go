@@ -12,28 +12,28 @@ import (
 )
 
 // values should match with the client sides as well.
-const enableJWT = true
-const namespace = "default"
+// const enableJWT = true
+// const namespace = "default"
 
 // if namespace is empty then simply websocket.Events{...} can be used instead.
 var serverEvents = websocket.Namespaces{
-	namespace: websocket.Events{
+	config.WebSocket.Namespace: websocket.Events{
 		websocket.OnNamespaceConnected: func(nsConn *websocket.NSConn, msg websocket.Message) error {
 			// with `websocket.GetContext` you can retrieve the Iris' `Context`.
 			ctx := websocket.GetContext(nsConn.Conn)
 
-			log.Printf("[%s] connected to namespace [%s] with IP [%s]",
+			log.Printf("[WebSocket][%s] connected to namespace [%s] with IP [%s]",
 				nsConn, msg.Namespace,
 				ctx.RemoteAddr())
 			return nil
 		},
 		websocket.OnNamespaceDisconnect: func(nsConn *websocket.NSConn, msg websocket.Message) error {
-			log.Printf("[%s] disconnected from namespace [%s]", nsConn, msg.Namespace)
+			log.Printf("[WebSocket][%s] disconnected from namespace [%s]", nsConn, msg.Namespace)
 			return nil
 		},
 		"chat": func(nsConn *websocket.NSConn, msg websocket.Message) error {
 			// room.String() returns -> NSConn.String() returns -> Conn.String() returns -> Conn.ID()
-			log.Printf("[%s] sent: %s", nsConn, string(msg.Body))
+			log.Printf("[WebSocket][%s] sent: %s", nsConn, string(msg.Body))
 
 			// Write message back to the client message owner with:
 			// nsConn.Emit("chat", msg)
@@ -45,8 +45,10 @@ var serverEvents = websocket.Namespaces{
 }
 
 func InitWebSocket(app *iris.Application) {
+	if !config.WebSocket.On {
+		return
+	}
 
-	// app := iris.New()
 	websocketServer := websocket.New(
 		websocket.DefaultGorillaUpgrader, /* DefaultGobwasUpgrader can be used too. */
 		serverEvents)
@@ -81,16 +83,16 @@ func InitWebSocket(app *iris.Application) {
 	}
 
 	websocketServer.OnUpgradeError = func(err error) {
-		log.Panicf("Upgrade ERR: %s\n", err.Error())
+		log.Panicf("[WebSocket]Upgrade ERR: %s\n", err.Error())
 	}
 
-	app.Logger().Infof("Websocket serves on %s", "ws://localhost:8080/echo")
-	// serves the endpoint of ws://localhost:8080/echo
+	app.Logger().Infof("[WebSocket] serves on %s", "ws://localhost:8080"+config.WebSocket.Endpoint)
+	// serves the endpoint of ws://localhost:8080/websocket
 	// with optional custom ID generator.
 	// websocketRoute := app.Get("/echo", websocket.Handler(websocketServer, idGen))
-	app.Get("/echo", websocket.Handler(websocketServer, idGen))
+	app.Get(config.WebSocket.Endpoint, websocket.Handler(websocketServer, idGen))
 
-	if enableJWT {
+	if config.WebSocket.Enablejwt {
 		// Register the jwt middleware (on handshake):
 		// websocketRoute.Use(j.Serve)
 		// OR
@@ -98,12 +100,12 @@ func InitWebSocket(app *iris.Application) {
 		// Check for token through the jwt middleware
 		// on websocket connection or on any event:
 		websocketServer.OnConnect = func(c *websocket.Conn) error {
-			log.Printf("有连接：%v", c.ID())
+			// log.Printf("有连接：%v", c.ID())
 			ctx := websocket.GetContext(c)
 			if err := j.CheckJWT(ctx); err != nil {
 				// will send the above error on the client
 				// and will not allow it to connect to the websocket server at all.
-				log.Printf("JWT ERR: %s\n", err.Error())
+				log.Printf("[WebSocket]JWT ERR: %s\n", err.Error())
 				return err
 			}
 
@@ -114,16 +116,10 @@ func InitWebSocket(app *iris.Application) {
 			log.Printf("Claim content:")
 			log.Printf("%#+v\n", user.Claims)
 
-			log.Printf("[%s] connected to the server", c.ID())
+			log.Printf("[WebSocket][%s] connected to the server", c.ID())
 
 			return nil
 		}
 	}
 
-	// 报错，没法用
-	// app.Get("/ws-client", func(ctx iris.Context) {
-	// 	ctx.ServeFile("./html/index.html")
-	// })
-
-	// go app.Listen(":8081")
 }

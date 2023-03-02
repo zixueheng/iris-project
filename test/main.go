@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2022-03-23 10:19:50
- * @LastEditTime: 2023-03-01 17:00:26
+ * @LastEditTime: 2023-03-02 14:48:00
  */
 package main
 
@@ -13,6 +13,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+
+	// "iris-project/app/config"
 	"log"
 	"os"
 	"time"
@@ -90,8 +92,9 @@ func esTest() {
 	// io.Copy(io.Discard, res.Body)
 }
 
-const (
-	endpoint              = "ws://localhost:8081/echo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJhZG1pbiIsImV4cCI6MTY3NzY4Mjg2OCwiaWF0IjoxNjc3NjM5NjY4LCJ1c2VyX2lkIjoiMSJ9.oY9gN_DWbON18d0_0OVwABuJbMF8cZju-9Ln-L99_es"
+var (
+	token                 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJhZG1pbiIsImV4cCI6MTY3Nzc2Njk1NSwiaWF0IjoxNjc3NzIzNzU1LCJ1c2VyX2lkIjoiMSJ9.X4JRI-1nd3vKoEvUkJ9uqArPFcFf0oZ_NOIxnO3Staw"
+	endpoint              = fmt.Sprintf("ws://localhost:8080%s?token=%s", "/websocket", token) // "ws://localhost:8080/websocket?token="
 	namespace             = "default"
 	dialAndConnectTimeout = 5 * time.Second
 )
@@ -120,9 +123,9 @@ func testWsClient() {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(dialAndConnectTimeout))
 	defer cancel()
 
-	// username := "heyongliang"
-	// dialer := websocket.GobwasDialer(websocket.GobwasDialerOptions{Header: websocket.GobwasHeader{"X-Username": []string{username}}})
-	dialer := websocket.DefaultGobwasDialer
+	username := "heyongliang"
+	dialer := websocket.GobwasDialer(websocket.GobwasDialerOptions{Header: websocket.GobwasHeader{"X-Username": []string{username}}})
+	// dialer := websocket.DefaultGobwasDialer
 	client, err := websocket.Dial(ctx, dialer, endpoint, clientEvents)
 	if err != nil {
 		panic(err)

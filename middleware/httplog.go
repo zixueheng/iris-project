@@ -5,7 +5,6 @@ import (
 	"iris-project/app/config"
 	"iris-project/global"
 	"iris-project/lib/es"
-	"iris-project/lib/util"
 	"log"
 	"strings"
 
@@ -14,7 +13,10 @@ import (
 	"github.com/kataras/iris/v12/middleware/accesslog"
 )
 
-var HttpLogIndexName = config.App.Appname + ".http_log"
+var (
+	AcLog            = MakeAccessLog()
+	HttpLogIndexName = config.App.Appname + ".http_log"
+)
 
 type CustomerLog struct {
 	*accesslog.Log
@@ -102,15 +104,15 @@ func (logWriter *HttpLogWriter) Write(p []byte) (n int, err error) {
 		return 0, nil
 	}
 	// 当前只记录admin的请求日志
-	if !util.InArray(
-		customLog.Fields.GetString(global.ClientKey),
-		[]string{
-			global.GetClient(global.AdminAPI),
-			/*global.GetClient(global.WapAPI),*/
-		},
-	) {
-		return 0, nil
-	}
+	// if !util.InArray(
+	// 	customLog.Fields.GetString(global.ClientKey),
+	// 	[]string{
+	// 		global.GetClient(global.AdminAPI),
+	// 		/*global.GetClient(global.WapAPI),*/
+	// 	},
+	// ) {
+	// 	return 0, nil
+	// }
 	customLog.Client = customLog.Fields.GetString(global.ClientKey)
 	customLog.UserID = customLog.Fields.GetString(global.UserID)
 	customLog.Params = customLog.Fields.GetString("params")

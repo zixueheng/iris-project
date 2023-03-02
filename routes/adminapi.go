@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-03-01 17:05:31
+ * @LastEditTime: 2023-03-02 14:26:11
  */
 package routes
 
@@ -21,6 +21,7 @@ import (
 // InitAdminAPI 初始化 AdminApi 模块路由
 func InitAdminAPI(app iris.Party) {
 	party := app.Party(global.AdminAPI, middleware.CrsAuth()).AllowMethods(iris.MethodOptions)
+	party.UseRouter(middleware.AcLog.Handler) // 使用httplog
 	// {
 	// 	adminParty.Get("/login", controller.Login)
 	// }
