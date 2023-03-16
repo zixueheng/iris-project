@@ -1,15 +1,15 @@
 # mysql
-docker run -d --name mysql --cap-add sys_nice -e MYSQL_ROOT_PASSWORD=123 -p 3306:3306 -v mysql:/var/lib/mysql mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --skip-name-resolve
+docker run -d --name mysql --cap-add sys_nice -e MYSQL_ROOT_PASSWORD=123 -p 3306:3306 -v mysql-volume:/var/lib/mysql mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --skip-name-resolve
 
 # rabbitmq
-docker run -d --name rabbitmq --restart=always -p 15672:15672 -p 5672:5672 -v rabbitmq:/var/lib/rabbitmq -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3.11.5-management
+docker run -d --name rabbitmq --restart=always -p 15672:15672 -p 5672:5672 -v rabbitmq-volume:/var/lib/rabbitmq -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3.11.5-management
 
 # redis
 docker run -d --name redis -p 6379:6379 redis --requirepass 123 
 
 # elasticsearch & kibana
 docker network create localnetwork
-docker run -d --name elasticsearch --net localnetwork -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx512m" -e "xpack.security.enabled=false" -e "xpack.security.transport.ssl.enabled=false" -e "http.cors.enabled=true" -e "http.cors.allow-origin='*'" -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:8.5.2
+docker run -d --name elasticsearch --net localnetwork -v elasticsearch-volume:/usr/share/elasticsearch/data -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx512m" -e "xpack.security.enabled=false" -e "xpack.security.transport.ssl.enabled=false" -e "http.cors.enabled=true" -e "http.cors.allow-origin='*'" -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:8.6.2
 
 docker run -d --name kibana --net localnetwork -p 5601:5601 kibana:8.5.2
 

@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-01 16:15:07
- * @LastEditTime: 2023-03-02 14:35:12
+ * @LastEditTime: 2023-03-15 16:19:32
  */
 package config
 
@@ -53,6 +53,16 @@ var (
 			User     string
 			Password string
 		}
+	}{}
+
+	// MongoDb MongoDb配置
+	MongoDb = struct {
+		On       bool
+		Host     string
+		Port     string
+		Name     string
+		Username string
+		Password string
 	}{}
 
 	// ES elasticsearch配置
@@ -186,6 +196,10 @@ func init() {
 	}
 
 	if err := configor.New(&configor.Config{Debug: false}).Load(&ES, filepath.Join(rootpath, "config/es.yml")); err != nil {
+		panic(err)
+	}
+
+	if err := configor.New(&configor.Config{Debug: false}).Load(&MongoDb, filepath.Join(rootpath, "config/mongodb.yml")); err != nil {
 		panic(err)
 	}
 
