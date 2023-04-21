@@ -1,6 +1,6 @@
 on: true
 host: localhost
 port: 27017
-name: test
-user: root
+db: test
+username: root
 password: 123

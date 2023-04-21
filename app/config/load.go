@@ -60,7 +60,7 @@ var (
 		On       bool
 		Host     string
 		Port     string
-		Name     string
+		Db       string
 		Username string
 		Password string
 	}{}
@@ -185,7 +185,7 @@ var (
 
 func init() {
 	rootpath, _ := os.Getwd()
-	// rootpath = "D:/go-projects/iris-project/"
+	rootpath = "D:/go-projects/iris-project/"
 	// fmt.Println(rootpath)
 	if err := configor.New(&configor.Config{Debug: false}).Load(&App, filepath.Join(rootpath, "config/app.yml")); err != nil {
 		panic(err)
