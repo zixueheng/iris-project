@@ -1,0 +1,3 @@
+docker run -d --name replica_db01 -p 37071:27017 -v /etc/mongodb/replica01.conf:/data/db/replica01.conf -v /etc/mongodb/key.file:/data/db/key.file mongo --config /data/db/replica01.conf
+docker run -d --name replica_db02 -p 37072:27017 -v /etc/mongodb/replica02.conf:/data/db/replica02.conf -v /etc/mongodb/key.file:/data/db/key.file mongo --config /data/db/replica02.conf
+docker run -d --name replica_db03 -p 37073:27017 -v /etc/mongodb/replica03.conf:/data/db/replica03.conf -v /etc/mongodb/key.file:/data/db/key.file mongo --config /data/db/replica03.conf

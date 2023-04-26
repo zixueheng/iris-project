@@ -18,3 +18,5 @@ docker run -d --name kibana --net localnetwork -p 5601:5601 kibana:8.5.2
 
 # mongodb
 docker run -d --name mongo -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123 -v mongo-volume:/data/db -p 27017:27017 mongo:6.0.4
+# mongodb with relica set(has error)
+docker run -d --name mongo -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123 -v mongo-volume:/data/db -v D:/go-projects/iris-project/lib/mongodb/conf:/etc/mongo -p 27017:27017 mongo:6.0.4 --config /etc/mongo/mongod.conf
