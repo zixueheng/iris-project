@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-13 10:27:54
- * @LastEditTime: 2023-04-26 15:22:12
+ * @LastEditTime: 2023-04-27 10:41:29
  */
 package main
 
@@ -20,12 +20,13 @@ import (
 )
 
 func main() {
-	saveOne()
-	saveAll()
+	// saveOne()
+	// saveAll()
 
 	// getByID()
 	// findOne()
-	findAll()
+	// findAll()
+	count()
 
 	// transaction()
 }
@@ -72,6 +73,11 @@ func saveOne() {
 	}
 	log.Printf("%+v, %v\n", order, order.ID.Hex())
 	log.Println("-------")
+}
+
+func count() {
+	count, err := mongodb.Count(nil, nil, &model.Order{}, bson.D{})
+	log.Printf("Count: %d, Error: %v", count, err)
 }
 
 func saveAll() {

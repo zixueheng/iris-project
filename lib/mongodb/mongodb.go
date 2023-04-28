@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:04:43
- * @LastEditTime: 2023-04-26 14:48:35
+ * @LastEditTime: 2023-04-27 10:50:41
  */
 package mongodb
 
@@ -230,6 +230,26 @@ func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface
 	}
 
 	return nil
+}
+
+// Count 查询数量
+func Count(db *mongo.Database, ctx context.Context, m Model, filter interface{}) (int64, error) {
+	if db == nil {
+		db = GetDB()
+	}
+
+	name, err := getCollectionName(m)
+	if err != nil {
+		return 0, err
+	}
+	var opts *options.CountOptions
+	if f, ok := filter.(bson.D); ok {
+		if len(f) == 0 { // 查询所有使用_id 字段作为索引加快查询熟读
+			opts = options.Count().SetHint("_id_")
+		}
+	}
+
+	return db.Collection(name).CountDocuments(ctx, filter, opts)
 }
 
 func setCreateAt(obj interface{}) error {
