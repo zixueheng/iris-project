@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-13 10:27:54
- * @LastEditTime: 2023-04-27 10:41:29
+ * @LastEditTime: 2023-05-04 17:23:59
  */
 package main
 
@@ -26,9 +26,48 @@ func main() {
 	// getByID()
 	// findOne()
 	// findAll()
-	count()
+	// count()
+
+	// createUpdate()
+
+	// indexs()
 
 	// transaction()
+
+	// aggregate()
+	sum()
+
+}
+
+func aggregate() {
+	var (
+		results = make([]bson.M, 0)
+		stages  = []bson.D{
+			// {{"$match", bson.D{{"uid", 1}}}},
+
+			{{"$group", bson.D{{"_id", nil}, {"all_price", bson.D{{"$sum", "$total_price"}}}}}},
+		}
+	)
+	if err := mongodb.Aggregate(nil, nil, &model.Order{}, stages, &results); err != nil {
+		log.Println(err.Error())
+	}
+	for _, result := range results {
+		log.Printf("%v\n", result)
+	}
+	log.Println("-------")
+}
+
+func sum() {
+	amount, err := mongodb.Sum(nil, nil, &model.Order{}, bson.D{{"uid", 2}}, "total_price")
+	log.Printf("Amount: %v, Error: %v", amount, err)
+	log.Println("-------")
+}
+
+func indexs() {
+	if err := mongodb.Indexs(nil, nil, &model.Order{}, bson.D{{"trade_no", 1}}, true); err != nil {
+		log.Println(err.Error())
+	}
+	log.Println("-------")
 }
 
 func getByID() {
@@ -65,19 +104,41 @@ func findAll() {
 	log.Println("-------")
 }
 
+func count() {
+	count, err := mongodb.Count(nil, nil, &model.Order{}, bson.D{})
+	log.Printf("Count: %d, Error: %v", count, err)
+}
+
+func createUpdate() {
+	var order = &model.Order{
+		UID: 4, TradeNo: "4001", TotalPrice: 196.5, TotalNum: 8,
+	}
+	if err := mongodb.CreateUpdate(nil, nil, order); err != nil {
+		log.Printf("%v\n", err)
+	} else {
+		log.Printf("%+v\n", order)
+	}
+
+	// update
+	order.TotalPrice = 268.25
+	order.TotalNum = 10
+	if err := mongodb.CreateUpdate(nil, nil, order); err != nil {
+		log.Printf("%v\n", err)
+	} else {
+		log.Printf("%+v\n", order)
+	}
+
+	log.Println("-------")
+}
+
 func saveOne() {
-	order := &model.Order{UID: 1, TradeNo: "1000", TotalPrice: 88, TotalNum: 2}
+	order := &model.Order{UID: 1, TradeNo: "1001", Name: "何永亮", TotalPrice: 88, TotalNum: 2}
 	err := mongodb.SaveOne(nil, nil, order)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 	}
 	log.Printf("%+v, %v\n", order, order.ID.Hex())
 	log.Println("-------")
-}
-
-func count() {
-	count, err := mongodb.Count(nil, nil, &model.Order{}, bson.D{})
-	log.Printf("Count: %d, Error: %v", count, err)
 }
 
 func saveAll() {

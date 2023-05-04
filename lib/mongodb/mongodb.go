@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:04:43
- * @LastEditTime: 2023-04-27 10:50:41
+ * @LastEditTime: 2023-05-04 17:30:35
  */
 package mongodb
 
@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"iris-project/global"
 	"iris-project/lib/util"
+	"log"
 	"reflect"
 	"time"
 
@@ -89,6 +90,27 @@ func getCollectionName(m Model) (string, error) {
 	}
 
 	return util.ToSnakeCase(name), nil
+}
+
+// Indexs 创建索引，keys如：bson.D{{"title", 1}}
+func Indexs(db *mongo.Database, ctx context.Context, m Model, keys bson.D, unique bool) error {
+	if db == nil {
+		db = GetDB()
+	}
+
+	name, err := getCollectionName(m)
+	if err != nil {
+		return err
+	}
+
+	indexModel := mongo.IndexModel{
+		Keys:    keys,
+		Options: options.Index().SetUnique(unique),
+	}
+	if _, err := db.Collection(name).Indexes().CreateOne(ctx, indexModel); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetByID 根据ID查询
@@ -232,6 +254,86 @@ func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface
 	return nil
 }
 
+// Aggregate 聚合查询，可进行分组、合计、平均等聚合操作；results应该是个指针
+//
+// 聚合管道操作：https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/
+//
+// stages 示例：
+//
+//	[]bson.D{
+//		bson.D{{"$match", bson.D{{"toppings", "milk foam"}}}} // 匹配字段条件
+//		bson.D{{"$unset", bson.A{"_id", "category"}}} // 排除字段
+//		bson.D{{"$sort", bson.D{{"price", 1}, {"toppings", 1}}}} // 排序
+//		bson.D{{"$limit", 2}} // 限定数量
+//	}
+//
+// 分组：
+//
+//	[]bson.D{
+//	    bson.D{{"$group", bson.D{
+//	        {"_id", "$category"}, // 按 category分组
+//	        {"average_price", bson.D{{"$avg", "$price"}}}, // average_price字段统计 price的平均值
+//	        {"type_total", bson.D{{"$sum", 1}}}, // type_total 合计数量
+//	    }}}
+//	}
+//
+// 查询数量：
+//
+//	[]bson.D{
+//		bson.D{{"$match", bson.D{{"rating", bson.D{{"$gt", 5}}}}}},
+//		bson.D{{"$count", "counted_documents"}},
+//	}
+//
+// 结果：[{counted_documents 5}]
+func Aggregate(db *mongo.Database, ctx context.Context, m Model, stages []bson.D, results interface{}) error {
+	if db == nil {
+		db = GetDB()
+	}
+
+	name, err := getCollectionName(m)
+	if err != nil {
+		return err
+	}
+
+	pipeline := mongo.Pipeline{}
+	for _, stage := range stages {
+		pipeline = append(pipeline, stage)
+	}
+
+	cursor, err := db.Collection(name).Aggregate(ctx, pipeline)
+	if err != nil {
+		return err
+	}
+
+	if err = cursor.All(ctx, results); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Sum 求和查询，filter查询条件，field求和字段
+func Sum(db *mongo.Database, ctx context.Context, m Model, filter bson.D, field string) (amount interface{}, err error) {
+	var (
+		results = make([]bson.M, 0)
+		stages  = []bson.D{
+			{{"$match", filter}},
+			{{"$group", bson.D{{"_id", nil}, {"amount", bson.D{{"$sum", "$" + field}}}}}},
+		}
+	)
+	if err = Aggregate(nil, nil, m, stages, &results); err != nil {
+		return
+	}
+	for _, result := range results {
+		log.Printf("%v\n", result)
+		if v, ok := result["amount"]; ok {
+			return v, nil
+		}
+	}
+	err = errors.New("not found field amount")
+	return
+}
+
 // Count 查询数量
 func Count(db *mongo.Database, ctx context.Context, m Model, filter interface{}) (int64, error) {
 	if db == nil {
@@ -244,7 +346,7 @@ func Count(db *mongo.Database, ctx context.Context, m Model, filter interface{})
 	}
 	var opts *options.CountOptions
 	if f, ok := filter.(bson.D); ok {
-		if len(f) == 0 { // 查询所有使用_id 字段作为索引加快查询熟读
+		if len(f) == 0 { // 查询所有使用_id 字段作为索引加快查询速度
 			opts = options.Count().SetHint("_id_")
 		}
 	}
@@ -285,6 +387,7 @@ func setCreateAt(obj interface{}) error {
 	return nil
 }
 
+// CreateUpdate 新增或更新，ID存在更新不存在则新增
 func CreateUpdate(db *mongo.Database, ctx context.Context, m Model) error {
 	if db == nil {
 		db = GetDB()
@@ -295,8 +398,11 @@ func CreateUpdate(db *mongo.Database, ctx context.Context, m Model) error {
 	}
 	if m.GetID().IsZero() { // create
 		setCreateAt(m)
-		if _, err := db.Collection(name).InsertOne(ctx, m); err != nil {
+		if res, err := db.Collection(name).InsertOne(ctx, m); err != nil {
 			return err
+		} else {
+			id, _ := res.InsertedID.(primitive.ObjectID)
+			m.SetID(id)
 		}
 	} else { // update
 		if _, err := db.Collection(name).ReplaceOne(ctx, bson.D{{"_id", m.GetID()}}, m); err != nil {
@@ -417,46 +523,3 @@ func Transaction(ctx context.Context, fn func(ctx mongo.SessionContext) (interfa
 
 	return nil
 }
-
-/*
-func T(){
-	// start-session
-	wc := writeconcern.New(writeconcern.WMajority())
-	txnOptions := options.Transaction().SetWriteConcern(wc)
-
-	session, err := GetClient().StartSession()
-	if err != nil {
-		panic(err)
-	}
-	defer session.EndSession(nil)
-
-	err = mongo.WithSession(nil, session, func(ctx mongo.SessionContext) error {
-		if err = session.StartTransaction(txnOptions); err != nil {
-			return err
-		}
-
-		docs := []interface{}{
-			bson.D{{"title", "The Year of Magical Thinking"}, {"author", "Joan Didion"}},
-			bson.D{{"title", "Play It As It Lays"}, {"author", "Joan Didion"}},
-			bson.D{{"title", "The White Album"}, {"author", "Joan Didion"}},
-		}
-		result, err := coll.InsertMany(ctx, docs)
-		if err != nil {
-			return err
-		}
-
-		if err = session.CommitTransaction(ctx); err != nil {
-			return err
-		}
-
-		// fmt.Println(result.InsertedIDs)
-		return nil
-	})
-	if err != nil {
-		if err := session.AbortTransaction(context.TODO()); err != nil {
-			panic(err)
-		}
-		panic(err)
-	}
-}
-*/
