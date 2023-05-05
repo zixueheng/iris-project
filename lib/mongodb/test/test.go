@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-13 10:27:54
- * @LastEditTime: 2023-05-04 17:23:59
+ * @LastEditTime: 2023-05-05 16:55:46
  */
 package main
 
@@ -22,6 +22,7 @@ import (
 func main() {
 	// saveOne()
 	// saveAll()
+	updateAll()
 
 	// getByID()
 	// findOne()
@@ -35,8 +36,82 @@ func main() {
 	// transaction()
 
 	// aggregate()
-	sum()
+	// sum()
 
+	pageGroup()
+
+}
+
+func page() {
+	var (
+		page int = 1
+		size int = 2
+	)
+	searchList := &mongodb.SearchListData{
+		M:      &model.Order{},
+		Filter: bson.D{},
+		Sort:   bson.D{{"created_at", -1}, {"_id", -1}},
+		Page:   page,
+		Size:   size,
+	}
+
+	var (
+		orders []*model.Order
+		total  int64
+	)
+	if err := searchList.GetList(&orders, &total); err != nil {
+		log.Println(err.Error())
+		return
+	}
+	log.Println(total)
+	for _, order := range orders {
+		log.Printf("%+v\n", order)
+	}
+	log.Println("-------")
+}
+
+func pageGroup() {
+	var (
+		page int = 1
+		size int = 2
+	)
+	searchList := &mongodb.SearchListData{
+		M:      &model.Order{},
+		Filter: bson.D{},
+		Sort:   bson.D{{"created_at", -1}, {"_id", -1}},
+		Page:   page,
+		Size:   size,
+		Group:  []string{"uid"},
+		GroupField: bson.D{
+			{"name", bson.D{{"$first", "$name"}}},
+			{"all_price", bson.D{{"$sum", "$total_price"}}},
+			{"all_num", bson.D{{"$sum", "$total_num"}}},
+			{"count", bson.D{{"$sum", 1}}},
+		},
+	}
+
+	type Res struct {
+		UID      int     `bson:"_id" json:"uid"`
+		Name     string  `bson:"name" json:"name"`
+		AllPrice float64 `bson:"all_price" json:"all_price"`
+		AllNum   int     `bson:"all_num" json:"all_num"`
+		Count    int     `bson:"count" json:"count"`
+	}
+
+	var (
+		// results []bson.M
+		results []Res
+		total   int64
+	)
+	if err := searchList.GetList(&results, &total); err != nil {
+		log.Println(err.Error())
+		return
+	}
+	log.Println(total)
+	for _, result := range results {
+		log.Printf("%+v\n", result)
+	}
+	log.Println("-------")
 }
 
 func aggregate() {
@@ -157,6 +232,12 @@ func saveAll() {
 		log.Printf("%+v\n", order)
 	}
 	log.Println("-------")
+}
+
+func updateAll() {
+	mongodb.UpdateAll(nil, nil, &model.Order{}, bson.D{{"uid", 2}}, bson.D{{"$set", bson.D{{"name", "黄晓明"}}}})
+	mongodb.UpdateAll(nil, nil, &model.Order{}, bson.D{{"uid", 3}}, bson.D{{"$set", bson.D{{"name", "刘亦菲"}}}})
+	mongodb.UpdateAll(nil, nil, &model.Order{}, bson.D{{"uid", 4}}, bson.D{{"$set", bson.D{{"name", "张三丰"}}}})
 }
 
 func transaction() {

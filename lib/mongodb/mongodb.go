@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:04:43
- * @LastEditTime: 2023-05-04 17:30:35
+ * @LastEditTime: 2023-05-05 17:00:57
  */
 package mongodb
 
@@ -183,6 +183,7 @@ type QueryOpts struct {
 	Projection bson.D // 包含或排除字段，1包含 0排除，如 bson.D{{"course_id", 0}, {"enrollment", 0}}
 	Sort       bson.D // 排序，可按多个字段排序 1 asc -1 desc，如 bson.D{{"total_price", 1}
 	Limit      int64  // 限定数量
+	Skip       int64  // 跳过数量
 }
 
 // FindOne 查找一个结果
@@ -240,6 +241,9 @@ func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface
 		}
 		if op.Limit != 0 {
 			opts = append(opts, options.Find().SetLimit(op.Limit))
+		}
+		if op.Skip != 0 {
+			opts = append(opts, options.Find().SetSkip(op.Skip))
 		}
 	}
 
@@ -522,4 +526,95 @@ func Transaction(ctx context.Context, fn func(ctx mongo.SessionContext) (interfa
 	// end-session
 
 	return nil
+}
+
+// SearchListData 通用列表查询条件
+type SearchListData struct {
+	Db               *mongo.Database
+	Ctx              context.Context
+	M                Model
+	Filter           interface{}
+	Projection, Sort bson.D
+	Group            []string // 分组字段
+	GroupField       bson.D   // 分组字段外额外字段，如已有字段或合计字段 bson.D{{"name", bson.D{{"$first", "$name"}}}, {"all_price", bson.D{{"$sum", "$total_price"}}}}
+	Page, Size       int
+}
+
+// GetList 通用列表查询
+func (s *SearchListData) GetList(results interface{}, total *int64) (err error) {
+	var (
+		skip = int64((s.Page - 1) * s.Size)
+		size = int64(s.Size)
+	)
+	if len(s.Group) == 0 { // 普通查询
+		opts := &QueryOpts{
+			Projection: s.Projection,
+			Sort:       s.Sort,
+			Skip:       skip,
+			Limit:      size,
+		}
+		// log.Printf("opts %+v\n", opts)
+		if *total, err = Count(s.Db, s.Ctx, s.M, s.Filter); err != nil {
+			return
+		}
+		if err = FindAll(s.Db, s.Ctx, s.M, results, s.Filter, opts); err != nil {
+			return
+		}
+	} else { // 分组查询
+		var (
+			stages  = []bson.D{}
+			stages2 = []bson.D{}
+		)
+
+		if s.Filter != nil {
+			stages = append(stages, bson.D{{"$match", s.Filter}})
+			stages2 = append(stages2, bson.D{{"$match", s.Filter}})
+		}
+		if s.Projection != nil {
+			stages = append(stages, bson.D{{"$project", s.Projection}})
+		}
+		if len(s.Group) == 1 {
+			var group = bson.D{{"_id", "$" + s.Group[0]}}
+			for _, groupField := range s.GroupField {
+				group = append(group, groupField)
+			}
+			stages = append(stages, bson.D{{"$group", group}})
+			stages2 = append(stages2, bson.D{{"$group", group}})
+		} else {
+			var groupArr = []bson.E{}
+			for _, s := range s.Group {
+				groupArr = append(groupArr, bson.E{s, "$" + s})
+			}
+			var group = bson.D{{"_id", groupArr}}
+			for _, groupField := range s.GroupField {
+				group = append(group, groupField)
+			}
+			stages = append(stages, bson.D{{"$group", group}})
+			stages2 = append(stages2, bson.D{{"$group", group}})
+		}
+		if s.Sort != nil {
+			stages = append(stages, bson.D{{"$sort", s.Sort}})
+		}
+		stages = append(stages, bson.D{{"$skip", skip}})
+		stages = append(stages, bson.D{{"$limit", size}})
+		stages2 = append(stages2, bson.D{{"$count", "count"}})
+		// log.Printf("stages %v\n", stages)
+		// log.Printf("stages2 %v\n", stages2)
+		if err = Aggregate(s.Db, s.Ctx, s.M, stages, results); err != nil {
+			return
+		}
+
+		var countRes = make([]bson.M, 0)
+		if err = Aggregate(s.Db, s.Ctx, s.M, stages2, &countRes); err != nil {
+			return
+		}
+
+		for _, res := range countRes {
+			if v, ok := res["count"]; ok {
+				*total = int64(util.InterfaceToInt(v))
+			}
+		}
+	}
+
+	return
 }
