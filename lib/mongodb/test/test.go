@@ -4,13 +4,14 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-13 10:27:54
- * @LastEditTime: 2023-05-05 16:55:46
+ * @LastEditTime: 2023-05-22 17:46:35
  */
 package main
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"iris-project/lib/mongodb"
 	"iris-project/lib/mongodb/model"
 	"log"
@@ -22,7 +23,7 @@ import (
 func main() {
 	// saveOne()
 	// saveAll()
-	updateAll()
+	// updateAll()
 
 	// getByID()
 	// findOne()
@@ -38,8 +39,28 @@ func main() {
 	// aggregate()
 	// sum()
 
-	pageGroup()
+	// pageGroup()
 
+	testDecimal128()
+
+}
+
+func testDecimal128() {
+	orders := make([]interface{}, 0)
+	orders = append(orders, &model.Order2{UID: 1, TradeNo: "2000", TotalPrice: 50.5, Discount: mongodb.GetDecimal128(12657), TotalNum: 1})
+	orders = append(orders, &model.Order2{UID: 1, TradeNo: "2001", TotalPrice: 100, Discount: mongodb.GetDecimal128(129.32), TotalNum: 1})
+	orders = append(orders, &model.Order2{UID: 2, TradeNo: "2002", TotalPrice: 200, Discount: mongodb.GetDecimal128("985522"), TotalNum: 2})
+	orders = append(orders, &model.Order2{UID: 2, TradeNo: "3000", TotalPrice: 50.5, Discount: mongodb.GetDecimal128("985522.45865"), TotalNum: 1})
+	orders = append(orders, &model.Order2{UID: 3, TradeNo: "3001", TotalPrice: 100, Discount: mongodb.GetDecimal128(9856587556.222567), TotalNum: 1})
+	orders = append(orders, &model.Order2{UID: 3, TradeNo: "3002", TotalPrice: 200, Discount: mongodb.GetDecimal128(-12536584.6585225), TotalNum: 2})
+	err := mongodb.SaveAll(nil, nil, &model.Order2{}, orders)
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+	}
+	for _, order := range orders {
+		log.Printf("%+v\n", order)
+	}
+	log.Println("-------")
 }
 
 func page() {
@@ -242,9 +263,15 @@ func updateAll() {
 
 func transaction() {
 	if err := mongodb.Transaction(context.Background(), func(ctx mongo.SessionContext) (interface{}, error) {
-		order := &model.Order{ID: mongodb.GetObjectIDFromStr("6440d1c4042ff0b52303effe")}
+		order := &model.Order{ID: mongodb.GetObjectIDFromStr("6455f58d1776ee67a2b7439c")}
 		if mongodb.GetByID(nil, ctx, order) {
-			if err := mongodb.UpdateByID(nil, ctx, order, bson.D{{"$set", bson.D{{"total_price", 123}}}}); err != nil {
+			if err := mongodb.UpdateByID(nil, ctx, order, bson.D{{"$set", bson.D{{"total_price", 222}}}}); err != nil {
+				return nil, err
+			}
+			if false {
+				return nil, errors.New("error manual")
+			}
+			if err := mongodb.UpdateByID(nil, ctx, order, bson.D{{"$unset", bson.D{{"total_numa", ""}}}}); err != nil {
 				return nil, err
 			}
 		}

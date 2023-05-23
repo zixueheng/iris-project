@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:04:43
- * @LastEditTime: 2023-05-05 17:00:57
+ * @LastEditTime: 2023-05-22 18:04:37
  */
 package mongodb
 
@@ -18,6 +18,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -52,6 +53,43 @@ func GetObjectIDFromStr(idStr string) primitive.ObjectID {
 		return primitive.NilObjectID
 	} else {
 		return id
+	}
+}
+
+// GetDecimal128 获取 Decimal128，参数obj数字或数字字符串
+func GetDecimal128(obj interface{}) primitive.Decimal128 {
+	var (
+		decimalStr string
+		zero       = primitive.NewDecimal128(0, 0)
+	)
+	switch value := obj.(type) {
+	case nil:
+		return zero
+	case int:
+		decimalStr = decimal.NewFromInt(int64(value)).String()
+	case int32:
+		decimalStr = decimal.NewFromInt(int64(value)).String()
+	case int64:
+		decimalStr = decimal.NewFromInt(value).String()
+	case uint:
+		decimalStr = decimal.NewFromInt(int64(value)).String()
+	case uint32:
+		decimalStr = decimal.NewFromInt(int64(value)).String()
+	case uint64:
+		decimalStr = decimal.NewFromInt(int64(value)).String()
+	case float32:
+		decimalStr = decimal.NewFromFloat32(value).String()
+	case float64:
+		decimalStr = decimal.NewFromFloat(value).String()
+	case string:
+		decimalStr = value
+	default:
+		return zero
+	}
+	if decimal128, err := primitive.ParseDecimal128(decimalStr); err != nil {
+		return zero
+	} else {
+		return decimal128
 	}
 }
 

@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:06:33
- * @LastEditTime: 2023-04-25 16:10:21
+ * @LastEditTime: 2023-05-06 14:35:44
  */
 package global
 
@@ -33,6 +33,7 @@ func init() {
 		uri = fmt.Sprintf("mongodb://%v:%v@%v:%v/?tz=Asia/Shanghai", config.MongoDb.Username, config.MongoDb.Password, config.MongoDb.Host, config.MongoDb.Port) // "mongodb://admin:123@localhost:27017"
 	)
 	// log.Println(uri)
+	uri = "mongodb+srv://356126067:hyl123456@cluster0.ru39nsc.mongodb.net/test"
 	MongoClient, err = mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
 		log.Println(err.Error())
