@@ -1,11 +1,3 @@
-/*
- * @Description: The program is written by the author, if modified at your own risk.
- * @Author: heyongliang
- * @Email: 356126067@qq.com
- * @Phone: 15215657185
- * @Date: 2023-03-13 10:27:54
- * @LastEditTime: 2023-05-22 17:46:35
- */
 package main
 
 import (
@@ -15,8 +7,10 @@ import (
 	"iris-project/lib/mongodb"
 	"iris-project/lib/mongodb/model"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -41,19 +35,17 @@ func main() {
 
 	// pageGroup()
 
-	testDecimal128()
-
 }
 
-func testDecimal128() {
+func saveAll() {
 	orders := make([]interface{}, 0)
-	orders = append(orders, &model.Order2{UID: 1, TradeNo: "2000", TotalPrice: 50.5, Discount: mongodb.GetDecimal128(12657), TotalNum: 1})
-	orders = append(orders, &model.Order2{UID: 1, TradeNo: "2001", TotalPrice: 100, Discount: mongodb.GetDecimal128(129.32), TotalNum: 1})
-	orders = append(orders, &model.Order2{UID: 2, TradeNo: "2002", TotalPrice: 200, Discount: mongodb.GetDecimal128("985522"), TotalNum: 2})
-	orders = append(orders, &model.Order2{UID: 2, TradeNo: "3000", TotalPrice: 50.5, Discount: mongodb.GetDecimal128("985522.45865"), TotalNum: 1})
-	orders = append(orders, &model.Order2{UID: 3, TradeNo: "3001", TotalPrice: 100, Discount: mongodb.GetDecimal128(9856587556.222567), TotalNum: 1})
-	orders = append(orders, &model.Order2{UID: 3, TradeNo: "3002", TotalPrice: 200, Discount: mongodb.GetDecimal128(-12536584.6585225), TotalNum: 2})
-	err := mongodb.SaveAll(nil, nil, &model.Order2{}, orders)
+	orders = append(orders, &model.Order{UID: 1, TradeNo: "2000", TotalPrice: mongodb.GetDecimal128(50.5), Discount: mongodb.GetDecimal128(12657), TotalNum: 1, OpLog: []string{"下单"}})
+	orders = append(orders, &model.Order{UID: 1, TradeNo: "2001", TotalPrice: mongodb.GetDecimal128(100), Discount: mongodb.GetDecimal128(129.32), TotalNum: 1, OpLog: []string{"下单", "支付"}})
+	orders = append(orders, &model.Order{UID: 2, TradeNo: "2002", TotalPrice: mongodb.GetDecimal128(200), Discount: mongodb.GetDecimal128("985522"), TotalNum: 2, OpLog: []string{"下单", "支付", "发货"}})
+	orders = append(orders, &model.Order{UID: 2, TradeNo: "3000", TotalPrice: mongodb.GetDecimal128(50.5), Discount: mongodb.GetDecimal128("985522.45865"), TotalNum: 1, OpLog: []string{}})
+	orders = append(orders, &model.Order{UID: 3, TradeNo: "3001", TotalPrice: mongodb.GetDecimal128(100), Discount: mongodb.GetDecimal128(9856587556.222567), TotalNum: 1})
+	orders = append(orders, &model.Order{UID: 3, TradeNo: "3002", TotalPrice: mongodb.GetDecimal128(200), Discount: mongodb.GetDecimal128(-12536584.6585225), TotalNum: 2})
+	err := mongodb.SaveAll(nil, nil, &model.Order{}, orders)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 	}
@@ -167,7 +159,7 @@ func indexs() {
 }
 
 func getByID() {
-	order := &model.Order{ID: mongodb.GetObjectIDFromStr("6440d1c4042ff0b52303effe")}
+	order := &model.Order{ID: mongodb.GetObjectIDFromStr("6478032e8d41c0b93d10cb84")}
 	if mongodb.GetByID(nil, nil, order) {
 		log.Printf("%+v\n", order)
 	} else {
@@ -188,7 +180,7 @@ func findOne() {
 
 func findAll() {
 	var orders []*model.Order
-	if err := mongodb.FindAll(nil, nil, &model.Order{}, &orders, bson.D{{"uid", 3}}, nil); err != nil {
+	if err := mongodb.FindAll(nil, nil, &model.Order{}, &orders, bson.D{{"uid", 1}}, nil); err != nil {
 		log.Println(err.Error())
 	} else {
 		for _, order := range orders {
@@ -207,7 +199,7 @@ func count() {
 
 func createUpdate() {
 	var order = &model.Order{
-		UID: 4, TradeNo: "4001", TotalPrice: 196.5, TotalNum: 8,
+		UID: 4, TradeNo: "4001", TotalPrice: mongodb.GetDecimal128(196.5), TotalNum: 8,
 	}
 	if err := mongodb.CreateUpdate(nil, nil, order); err != nil {
 		log.Printf("%v\n", err)
@@ -216,7 +208,7 @@ func createUpdate() {
 	}
 
 	// update
-	order.TotalPrice = 268.25
+	order.TotalPrice = mongodb.GetDecimal128(268.25)
 	order.TotalNum = 10
 	if err := mongodb.CreateUpdate(nil, nil, order); err != nil {
 		log.Printf("%v\n", err)
@@ -228,7 +220,7 @@ func createUpdate() {
 }
 
 func saveOne() {
-	order := &model.Order{UID: 1, TradeNo: "1001", Name: "何永亮", TotalPrice: 88, TotalNum: 2}
+	order := &model.Order{UID: 1, TradeNo: "1005", Name: "何永亮", TotalPrice: mongodb.GetDecimal128(88.99), Discount: mongodb.GetDecimal128(0), TotalNum: 2, DeliverTime: primitive.NewDateTimeFromTime(time.Now())}
 	err := mongodb.SaveOne(nil, nil, order)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
@@ -237,23 +229,23 @@ func saveOne() {
 	log.Println("-------")
 }
 
-func saveAll() {
-	orders := make([]interface{}, 0)
-	orders = append(orders, &model.Order{UID: 2, TradeNo: "2000", TotalPrice: 50.5, TotalNum: 1})
-	orders = append(orders, &model.Order{UID: 2, TradeNo: "2001", TotalPrice: 100, TotalNum: 1})
-	orders = append(orders, &model.Order{UID: 2, TradeNo: "2002", TotalPrice: 200, TotalNum: 2})
-	orders = append(orders, &model.Order{UID: 3, TradeNo: "3000", TotalPrice: 50.5, TotalNum: 1})
-	orders = append(orders, &model.Order{UID: 3, TradeNo: "3001", TotalPrice: 100, TotalNum: 1})
-	orders = append(orders, &model.Order{UID: 3, TradeNo: "3002", TotalPrice: 200, TotalNum: 2})
-	err := mongodb.SaveAll(nil, nil, &model.Order{}, orders)
-	if err != nil {
-		log.Printf("Error: %v\n", err)
-	}
-	for _, order := range orders {
-		log.Printf("%+v\n", order)
-	}
-	log.Println("-------")
-}
+// func saveAll() {
+// 	orders := make([]interface{}, 0)
+// 	orders = append(orders, &model.Order{UID: 2, TradeNo: "2000", TotalPrice: mongodb.GetDecimal128(50.5), TotalNum: 1})
+// 	orders = append(orders, &model.Order{UID: 2, TradeNo: "2001", TotalPrice: mongodb.GetDecimal128(100), TotalNum: 1})
+// 	orders = append(orders, &model.Order{UID: 2, TradeNo: "2002", TotalPrice: mongodb.GetDecimal128(200), TotalNum: 2})
+// 	orders = append(orders, &model.Order{UID: 3, TradeNo: "3000", TotalPrice: mongodb.GetDecimal128(50.5), TotalNum: 1})
+// 	orders = append(orders, &model.Order{UID: 3, TradeNo: "3001", TotalPrice: mongodb.GetDecimal128(100), TotalNum: 1})
+// 	orders = append(orders, &model.Order{UID: 3, TradeNo: "3002", TotalPrice: mongodb.GetDecimal128(200), TotalNum: 2})
+// 	err := mongodb.SaveAll(nil, nil, &model.Order{}, orders)
+// 	if err != nil {
+// 		log.Printf("Error: %v\n", err)
+// 	}
+// 	for _, order := range orders {
+// 		log.Printf("%+v\n", order)
+// 	}
+// 	log.Println("-------")
+// }
 
 func updateAll() {
 	mongodb.UpdateAll(nil, nil, &model.Order{}, bson.D{{"uid", 2}}, bson.D{{"$set", bson.D{{"name", "黄晓明"}}}})

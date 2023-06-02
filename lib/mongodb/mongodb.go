@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:04:43
- * @LastEditTime: 2023-05-22 18:04:37
+ * @LastEditTime: 2023-06-02 10:17:44
  */
 package mongodb
 
@@ -124,7 +124,7 @@ func getCollectionName(m Model) (string, error) {
 	typ = typ.Elem()
 	var name = typ.Name()
 	if name == "" {
-		return "", errors.New("[mongodb]no fond a name")
+		return "", errors.New("[mongodb]not fond a name from m")
 	}
 
 	return util.ToSnakeCase(name), nil
@@ -258,6 +258,8 @@ func FindOne(db *mongo.Database, ctx context.Context, m Model, filter interface{
 // FindAll 查找一个结果
 //
 // filter 查询条件：bson.D{{"uid", 1}}
+//
+// 特别注意：参数`m`和参数`results`切片元素必须是同一个类型
 func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface{}, filter interface{}, op *QueryOpts) error {
 	if db == nil {
 		db = GetDB()
@@ -477,7 +479,9 @@ func SaveOne(db *mongo.Database, ctx context.Context, m Model) error {
 
 // SaveAll 保存多个
 //
-// data 必须是Model类型的切片
+// 参数`data`必须是Model类型的切片
+//
+// 特别注意：参数`m`和参数`data`切片元素必须是同一个类型
 func SaveAll(db *mongo.Database, ctx context.Context, m Model, data []interface{}) error {
 	if len(data) == 0 {
 		return errors.New("save empty data")
