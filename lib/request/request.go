@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2022-10-31 16:20:04
+ * @LastEditTime: 2023-10-08 09:47:09
  */
 package request
 
@@ -12,7 +12,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -173,5 +173,5 @@ func (h *HTTPRequest) send(method string) ([]byte, error) {
 		return nil, fmt.Errorf("error http code :%d", resp.StatusCode) //errors.New(fmt.Sprintf("error http code :%d", resp.StatusCode))
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }

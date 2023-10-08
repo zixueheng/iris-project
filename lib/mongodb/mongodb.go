@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-03-15 16:04:43
- * @LastEditTime: 2023-06-02 10:17:44
+ * @LastEditTime: 2023-09-26 10:35:35
  */
 package mongodb
 
@@ -117,6 +117,9 @@ func getCollectionName(m Model) (string, error) {
 			return ""
 		}
 	*/
+	if m == nil {
+		return "", errors.New("[mongodb]m can not be nil")
+	}
 	var typ = reflect.TypeOf(m)
 	if typ.Kind() != reflect.Ptr {
 		return "", errors.New("[mongodb]m should be a ptr")
@@ -404,7 +407,7 @@ func setCreateAt(obj interface{}) error {
 
 	// 确保 obj 是指向结构体对象的指针类型
 	if objValue.Kind() != reflect.Ptr || objValue.Elem().Kind() != reflect.Struct {
-		return fmt.Errorf("obj must be a pointer to struct")
+		return fmt.Errorf("[mongodb]obj must be a pointer to struct")
 	}
 
 	// 获取结构体对象的反射值
@@ -422,7 +425,7 @@ func setCreateAt(obj interface{}) error {
 
 	// 确保值类型与字段类型一致
 	if fieldValue.Type() != valueOf.Type() {
-		return fmt.Errorf("value type does not match field type")
+		return fmt.Errorf("[mongodb]value type does not match field type")
 	}
 
 	// 设置字段值
