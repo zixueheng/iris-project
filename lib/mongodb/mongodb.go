@@ -230,7 +230,7 @@ type QueryOpts struct {
 // FindOne 查找一个结果
 //
 // filter 查询条件：bson.D{{"uid", 1}}
-func FindOne(db *mongo.Database, ctx context.Context, m Model, filter interface{}, op *QueryOpts) error {
+func FindOne(db *mongo.Database, ctx context.Context, m Model, filter interface{}, qo *QueryOpts) error {
 	if db == nil {
 		db = GetDB()
 	}
@@ -242,12 +242,12 @@ func FindOne(db *mongo.Database, ctx context.Context, m Model, filter interface{
 
 	var opts = make([]*options.FindOneOptions, 0)
 
-	if op != nil {
-		if op.Projection != nil {
-			opts = append(opts, options.FindOne().SetProjection(op.Projection))
+	if qo != nil {
+		if qo.Projection != nil {
+			opts = append(opts, options.FindOne().SetProjection(qo.Projection))
 		}
-		if op.Sort != nil {
-			opts = append(opts, options.FindOne().SetSort(op.Sort))
+		if qo.Sort != nil {
+			opts = append(opts, options.FindOne().SetSort(qo.Sort))
 		}
 	}
 
@@ -263,7 +263,7 @@ func FindOne(db *mongo.Database, ctx context.Context, m Model, filter interface{
 // filter 查询条件：bson.D{{"uid", 1}}
 //
 // 特别注意：参数`m`和参数`results`切片元素必须是同一个类型
-func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface{}, filter interface{}, op *QueryOpts) error {
+func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface{}, filter interface{}, qo *QueryOpts) error {
 	if db == nil {
 		db = GetDB()
 	}
@@ -275,18 +275,18 @@ func FindAll(db *mongo.Database, ctx context.Context, m Model, results interface
 
 	var opts = make([]*options.FindOptions, 0)
 
-	if op != nil {
-		if op.Projection != nil {
-			opts = append(opts, options.Find().SetProjection(op.Projection))
+	if qo != nil {
+		if qo.Projection != nil {
+			opts = append(opts, options.Find().SetProjection(qo.Projection))
 		}
-		if op.Sort != nil {
-			opts = append(opts, options.Find().SetSort(op.Sort))
+		if qo.Sort != nil {
+			opts = append(opts, options.Find().SetSort(qo.Sort))
 		}
-		if op.Limit != 0 {
-			opts = append(opts, options.Find().SetLimit(op.Limit))
+		if qo.Limit != 0 {
+			opts = append(opts, options.Find().SetLimit(qo.Limit))
 		}
-		if op.Skip != 0 {
-			opts = append(opts, options.Find().SetSkip(op.Skip))
+		if qo.Skip != 0 {
+			opts = append(opts, options.Find().SetSkip(qo.Skip))
 		}
 	}
 

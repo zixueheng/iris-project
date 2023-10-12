@@ -1,6 +1,6 @@
 # 执行构建命令：docker build -t iris-project-app .
-# 启动容器：docker run -d --name iris-project-app --network host synm（linux下可用）
-# docker run -d --name iris-project-app -p 8080:8080 synm（确保容器能访问mysql和redis）
+# 启动容器：docker run -d --name iris-project-app --network host iris-project-app（linux下可用）
+# docker run -d --name iris-project-app -p 8080:8080 iris-project-app（确保容器能访问mysql和redis）
 # 容器内访问：curl -X POST -d '{"username": "admin", "password": "123456"}' -H 'Content-Type: application/json' http://127.0.0.1:8080/adminapi/login
 FROM golang:latest as builder
 ENV GOPROXY=https://goproxy.cn,direct

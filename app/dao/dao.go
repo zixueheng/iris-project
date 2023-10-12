@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-05 11:06:19
- * @LastEditTime: 2022-11-10 11:30:13
+ * @LastEditTime: 2023-10-12 11:34:23
  */
 package dao
 
@@ -156,6 +156,37 @@ func Count(tx *gorm.DB, model interface{}, where map[string]interface{}) (count 
 	return
 }
 
+// QueryOpts 查询选项
+type QueryOpts struct {
+	Select  []string
+	OrderBy []string
+	Preload []string
+	Joins   []string // 如：[]string{"left join emails on emails.user_id = users.id"}
+	Group   string
+	// Limit, Skip int
+}
+
+func addQueryOpts(tx *gorm.DB, opts *QueryOpts) {
+	if tx == nil || opts == nil {
+		return
+	}
+	if len(opts.Select) > 0 {
+		tx.Select(opts.Select)
+	}
+	for _, orderby := range opts.OrderBy {
+		tx.Order(orderby)
+	}
+	for _, preload := range opts.Preload {
+		tx.Preload(preload)
+	}
+	for _, join := range opts.Joins {
+		tx.Joins(join)
+	}
+	if opts.Group != "" {
+		tx.Group(opts.Group)
+	}
+}
+
 // Scan 将查询结果扫描至结果result；tx主要支持事务，一般传nil；
 // options：fields, orderBys, preloads,group []string（注意group只能传一个字符串）
 func Scan(tx *gorm.DB, model interface{}, where map[string]interface{}, result interface{}, options ...[]string) error {
@@ -210,6 +241,25 @@ func Scan(tx *gorm.DB, model interface{}, where map[string]interface{}, result i
 	default:
 		return errors.New("options参数错误，如：fields, orderBys, preloads []string")
 	}
+	tx.Model(model).Scan(result)
+	return nil
+}
+
+// ScanOpts 将查询结果扫描至结果result；tx主要支持事务，一般传nil；
+func ScanOpts(tx *gorm.DB, model interface{}, where map[string]interface{}, result interface{}, opts *QueryOpts) error {
+	if tx == nil {
+		tx = GetDB()
+	}
+	if where != nil {
+		if conditionString, conditionValues, err := app.BuildCondition(where); err != nil {
+			return err
+		} else {
+			tx = tx.Where(conditionString, conditionValues...)
+		}
+	}
+
+	addQueryOpts(tx, opts)
+
 	tx.Model(model).Scan(result)
 	return nil
 }
@@ -277,7 +327,26 @@ func FindOne(tx *gorm.DB, model interface{}, where map[string]interface{}, optio
 		return errors.New("options参数错误，如：fields, orderBys, preloads []string")
 	}
 
-	tx.First(model)
+	tx.Take(model)
+	return nil
+}
+
+// FindOneOpts 按指定条件查找一个；tx主要支持事务，一般传nil；
+func FindOneOpts(tx *gorm.DB, model interface{}, where map[string]interface{}, opts *QueryOpts) error {
+	if tx == nil {
+		tx = GetDB()
+	}
+	if where != nil {
+		if conditionString, conditionValues, err := app.BuildCondition(where); err != nil {
+			return err
+		} else {
+			tx = tx.Where(conditionString, conditionValues...)
+		}
+	}
+
+	addQueryOpts(tx, opts)
+
+	tx.Take(model)
 	return nil
 }
 
@@ -327,6 +396,25 @@ func FindAll(tx *gorm.DB, dest interface{}, where map[string]interface{}, option
 	return nil
 }
 
+// FindAllOpts 按指定条件查询所有结果；tx主要支持事务，一般传nil，
+func FindAllOpts(tx *gorm.DB, dest interface{}, where map[string]interface{}, opts *QueryOpts) error {
+	if tx == nil {
+		tx = GetDB()
+	}
+	if where != nil {
+		if conditionString, conditionValues, err := app.BuildCondition(where); err != nil {
+			return err
+		} else {
+			tx = tx.Where(conditionString, conditionValues...)
+		}
+	}
+
+	addQueryOpts(tx, opts)
+
+	tx.Find(dest)
+	return nil
+}
+
 // FindLimit 按指定条件查询返回有限数量结果；tx主要支持事务，一般传nil，limit返回条数
 // 参数options：fields, orderBys, preloads []string
 func FindLimit(tx *gorm.DB, dest interface{}, where map[string]interface{}, limit int, options ...[]string) error {
@@ -368,6 +456,25 @@ func FindLimit(tx *gorm.DB, dest interface{}, where map[string]interface{}, limi
 	default:
 		return errors.New("options参数错误，如：fields, orderBys, preloads []string")
 	}
+
+	tx.Limit(limit).Find(dest)
+	return nil
+}
+
+// FindLimitOpts 按指定条件查询返回有限数量结果；tx主要支持事务，一般传nil，limit返回条数
+func FindLimitOpts(tx *gorm.DB, dest interface{}, where map[string]interface{}, limit int, opts *QueryOpts) error {
+	if tx == nil {
+		tx = GetDB()
+	}
+	if where != nil {
+		if conditionString, conditionValues, err := app.BuildCondition(where); err != nil {
+			return err
+		} else {
+			tx = tx.Where(conditionString, conditionValues...)
+		}
+	}
+
+	addQueryOpts(tx, opts)
 
 	tx.Limit(limit).Find(dest)
 	return nil
