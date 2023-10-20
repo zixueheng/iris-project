@@ -33,6 +33,7 @@ services:
   elasticsearch:
     container_name: es8
     image: elasticsearch:8.6.1
+    restart: always
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -44,6 +45,19 @@ services:
       - iris-project-app-network
     volumes:
       - elastic-volume:/usr/share/elasticsearch/data
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123
+    networks:
+      - iris-project-app-network
+    volumes:
+      - mongo-volume:/data/db
   iris-project-app:
     # 使用dockerfile编译 有问题 
     # build:
@@ -65,6 +79,7 @@ services:
       - mysql
       - redis
       - elasticsearch
+      - mongo
 networks:
   iris-project-app-network:
     driver: bridge
@@ -73,3 +88,4 @@ volumes:
   mysql-volume:
   redis-volume:
   elastic-volume:
+  mongo-volume:

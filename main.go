@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-03-02 14:43:54
+ * @LastEditTime: 2023-10-19 14:46:29
  */
 package main
 
@@ -22,6 +22,7 @@ import (
 
 	"iris-project/routes"
 
+	// "github.com/joho/godotenv"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
@@ -29,6 +30,12 @@ import (
 
 // windows编译 go build -ldflags "-s -w -H=windowsgui" -o=iris-project-daemon.exe
 func main() {
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
+	// log.Printf("appname from .env: %s\n", os.Getenv("appname"))
+
 	app := newApp()
 
 	/*
