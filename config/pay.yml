@@ -6,7 +6,7 @@ alipay:
   privatekey: dfdsfsdf #应用私钥，支持PKCS1和PKCS8
   isprod: true #是否是正式环境
 weixinpay:
-  mchid: 1608446549 #商户ID 或者服务商模式的 sp_mchid
+  mchid: 123 #商户ID 或者服务商模式的 sp_mchid
   serialno: 5776DF2039B2179130D0D8337811F5B029888749 #商户证书的证书序列号
   apiv3key: e10adc3949ba59abbe56e057f20f883e #apiV3Key，商户平台获取
   apiclientcertfile: "config/weixinpay/apiclient_cert.pem" #公钥 apiclient_cert.pem

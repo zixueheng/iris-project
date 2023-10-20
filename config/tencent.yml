@@ -1,14 +1,14 @@
-appid: 1305957094
-secretid: AKID4xbz6wWpthFWWFhtoRoukJbcNlsiIbdO
-secretkey: VjgMltkKdfQu8rTs20qSoujHZaLp2yf5
+appid: 123
+secretid: 123
+secretkey: 123
 # 图形验证码
-captchaappid: 2052061423
-appsecretkey: 0x0a4kcN9yZdPgANjW55v3g**
+captchaappid: 123
+appsecretkey: 123
 sms: # 短信配置
-  appid: 1400565259
-  appkey: b3a067cbc0416d9e2ae1f7c8140bdd1d
-  sign: 申亚生物 # 签名
-  verifycodetemplete: 919684 # 验证码模板ID
+  appid: 123
+  appkey: 123
+  sign:  # 签名
+  verifycodetemplete: 123 # 验证码模板ID
   # suppliernewpassword: 1172337 # 供应商新密码提醒
   # customernewpassword: 1264406 # 客户新密码提醒
   # purchasetemplete: # 采购模板
