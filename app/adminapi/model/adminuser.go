@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2023-02-21 10:53:25
+ * @LastEditTime: 2024-03-01 09:58:23
  */
 package model
 
@@ -33,10 +33,10 @@ type AdminUser struct {
 	ID                  uint32           `gorm:"primaryKey;" json:"id"`
 	CreatedAt           global.LocalTime `gorm:"type:datetime;" json:"created_at"`
 	UpdatedAt           global.LocalTime `gorm:"type:datetime;" json:"updated_at"`
-	RefreshToken        string           `gorm:"type:varchar(100);" json:"-" validate:"-" comment:"刷新TOKEN"`
+	RefreshToken        string           `gorm:"type:varchar(255);" json:"-" validate:"-" comment:"刷新TOKEN"`
 	RefreshTokenExpired uint32           `gorm:"" json:"-" validate:"-" comment:"刷新TOKEN过期时间戳"`
 	Username            string           `gorm:"type:varchar(100);unique;not null;" json:"username"`
-	Realname            string           `gorm:"type:varchar(100);not null" json:"realname"`
+	Realname            string           `gorm:"type:varchar(255);not null" json:"realname"`
 	Password            string           `gorm:"type:varchar(100);not null" json:"-"`
 	Roles               []Role           `gorm:"many2many:admin_user_role;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;association_autoupdate:false;" json:"roles"`
 	SuperAdmin          bool             `gorm:"-" json:"super_admin"`                // 是否超级管理员

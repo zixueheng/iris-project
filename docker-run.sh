@@ -20,3 +20,6 @@ docker run -d --name kibana --net localnetwork -p 5601:5601 kibana:8.5.2
 docker run -d --name mongo -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123 -v mongo-volume:/data/db -p 27017:27017 mongo:6.0.4
 # mongodb with relica set(has error)
 docker run -d --name mongo -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123 -v mongo-volume:/data/db -v D:/go-projects/iris-project/lib/mongodb/conf:/etc/mongo -p 27017:27017 mongo:6.0.4 --config /etc/mongo/mongod.conf
+
+# minio
+docker run -d -p 9000:9000 -p 9001:9001 --name minio1 -v D:\minio\data:/data -e "MINIO_ROOT_USER=root" -e "MINIO_ROOT_PASSWORD=12345678" quay.io/minio/minio server /data --console-address ":9001"

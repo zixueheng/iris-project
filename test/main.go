@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2022-03-23 10:19:50
- * @LastEditTime: 2023-03-02 14:48:00
+ * @LastEditTime: 2024-07-08 14:47:33
  */
 package main
 
@@ -34,7 +34,7 @@ func main() {
 
 	// esTest()
 
-	testWsClient()
+	// testWsClient()
 
 	log.Println("执行完成")
 
@@ -93,7 +93,7 @@ func esTest() {
 }
 
 var (
-	token                 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJhZG1pbiIsImV4cCI6MTY3Nzc2Njk1NSwiaWF0IjoxNjc3NzIzNzU1LCJ1c2VyX2lkIjoiMSJ9.X4JRI-1nd3vKoEvUkJ9uqArPFcFf0oZ_NOIxnO3Staw"
+	token                 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJhZG1pbiIsImV4cCI6MTcxMDE3OTgwOSwiaWF0IjoxNzEwMTM2NjA5LCJ1c2VyX2lkIjoiMSJ9.BjqZc0jzMbzMxtN9Yz4CkvRgJdnJj4TDZy4PK5N7u14"
 	endpoint              = fmt.Sprintf("ws://localhost:8080%s?token=%s", "/websocket", token) // "ws://localhost:8080/websocket?token="
 	namespace             = "default"
 	dialAndConnectTimeout = 5 * time.Second

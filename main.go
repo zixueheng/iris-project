@@ -4,11 +4,12 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2023-10-19 14:46:29
+ * @LastEditTime: 2024-03-15 17:10:54
  */
 package main
 
 import (
+	// stdContext "context"
 	"fmt"
 	"io"
 	"os"
@@ -53,6 +54,7 @@ func main() {
 	*/
 
 	middleware.InitWebSocket(app) // 普通方式，mvc方式查看routes
+	middleware.InitCron()         // 启动定时任务
 	routes.InitRoute(app)         // 加载路由
 	// app.Listen(":8080")
 
@@ -116,6 +118,13 @@ func newApp() *iris.Application {
 		sqlDb.Close()
 
 		middleware.AcLog.Close()
+		middleware.CloseCron()
+
+		// timeout := 10 * time.Second
+		// ctx, cancel := stdContext.WithTimeout(stdContext.Background(), timeout)
+		// defer cancel()
+		// // close all hosts.
+		// app.Shutdown(ctx)
 	})
 
 	return app

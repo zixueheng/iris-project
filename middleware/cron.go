@@ -1,12 +1,4 @@
-/*
- * @Description: The program is written by the author, if modified at your own risk.
- * @Author: heyongliang
- * @Email: 356126067@qq.com
- * @Phone: 15215657185
- * @Date: 2021-07-21 14:51:34
- * @LastEditTime: 2023-02-21 16:34:18
- */
-package main
+package middleware
 
 import (
 	"io/ioutil"
@@ -20,34 +12,40 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-var lock sync.Mutex
+// 定时格式定义：https://pkg.go.dev/github.com/robfig/cron/v3@v3.0.1
+var cronTasks = map[string]func(){
+	// "@every 3s": func() {
+	// 	log.Println("every 3 second clock")
+	// },
+	"@every 1h": backDB,         // 每1小时备份数据
+	"@daily":    deleteOldFiles, // 每天清除旧文件
+}
 
-// var i = 1
+var checkCron *cron.Cron
 
-// 注意：已移动到middleware中，随项目启动（不需要手动执行了）
-// 编译后放到根目录运行。。。
-// windows编译 go build -ldflags "-s -w -H=windowsgui" -o=jmyjc-backup-daemon.exe
-func main() {
-
-	checkCron := cron.New() // 创建一个cron实例
-
-	// 执行定时任务
-
-	if _, err := checkCron.AddFunc("@every 1h", backDB); err != nil { // 每1小时备份数据
-		log.Println(err.Error())
-	}
-
-	if _, err := checkCron.AddFunc("@daily", deleteOldFiles); err != nil { // 每天清除旧文件
-		log.Println(err.Error())
+// InitCron 启动定时任务
+func InitCron() {
+	checkCron = cron.New() // 创建一个cron实例
+	for t, f := range cronTasks {
+		if _, err := checkCron.AddFunc(t, f); err != nil {
+			log.Println(err.Error())
+		}
 	}
 
 	// 启动/关闭
 	checkCron.Start()
-	defer checkCron.Stop()
-	select {
-	// 查询语句，保持程序运行，在这里等同于for{}
-	}
+	// defer checkCron.Stop()
+	// select {
+	// // 查询语句，保持程序运行，在这里等同于for{}
+	// }
 }
+
+// 关闭定时任务
+func CloseCron() {
+	checkCron.Stop()
+}
+
+var lock sync.Mutex
 
 // PathURL 路径
 const PathURL = "db-backup"
