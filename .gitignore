@@ -22,6 +22,7 @@
 bin/
 pkg/
 log/
+logs/
 ecp/
 upload/
 github.com/
