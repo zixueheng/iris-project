@@ -13,12 +13,12 @@ import (
 )
 
 // 定时格式定义：https://pkg.go.dev/github.com/robfig/cron/v3@v3.0.1
-var cronTasks = map[string]func(){
-	// "@every 3s": func() {
+var cronTasks = map[string][]func(){
+	// "@every 3s": {func() {
 	// 	log.Println("every 3 second clock")
-	// },
-	"@every 1h": backDB,         // 每1小时备份数据
-	"@daily":    deleteOldFiles, // 每天清除旧文件
+	// }},
+	"@every 1h": {backDB},         // 每1小时备份数据
+	"@daily":    {deleteOldFiles}, // 每天清除旧文件
 }
 
 var checkCron *cron.Cron
@@ -26,9 +26,11 @@ var checkCron *cron.Cron
 // InitCron 启动定时任务
 func InitCron() {
 	checkCron = cron.New() // 创建一个cron实例
-	for t, f := range cronTasks {
-		if _, err := checkCron.AddFunc(t, f); err != nil {
-			log.Println(err.Error())
+	for t, fSlice := range cronTasks {
+		for _, f := range fSlice {
+			if _, err := checkCron.AddFunc(t, f); err != nil {
+				log.Println(err.Error())
+			}
 		}
 	}
 
