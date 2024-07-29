@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:28:08
- * @LastEditTime: 2022-09-29 10:08:18
+ * @LastEditTime: 2024-07-29 17:09:52
  */
 package controller
 
@@ -34,7 +34,16 @@ func (c *File) BeforeActivation(b mvc.BeforeActivation) {
 	b.Dependencies().Register(GetAuthAdminUser)
 }
 
-// PostFileUpload 单文件上传
+// @Tags        文件
+// @Summary		单文件上传
+// @Description	单文件上传
+// @Accept		multipart/form-data
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		uploadfile	formData	file			true	"文件"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file/upload [post]
 func (c *File) PostFileUpload() {
 	// Get the file from the request.
 	file, info, err := c.Ctx.FormFile("uploadfile")
@@ -76,7 +85,16 @@ func (c *File) PostFileUpload() {
 
 }
 
-// PostFileMutipleUpload 多文件上传
+// @Tags        文件
+// @Summary		多文件上传
+// @Description	多文件上传
+// @Accept		multipart/form-data
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		uploadfiles	formData	file			true	"文件"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file/mutiple/upload [post]
 func (c *File) PostFileMutipleUpload() {
 	// Get the max post value size passed via iris.WithPostMaxMemory.
 	maxSize := c.Ctx.Application().ConfigurationReadOnly().GetPostMaxMemory()

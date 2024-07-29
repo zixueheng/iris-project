@@ -39,6 +39,13 @@ const docTemplate = `{
                 "summary": "创建或更新管理员",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "请求体",
                         "name": "account",
                         "in": "body",
@@ -73,6 +80,13 @@ const docTemplate = `{
                 "summary": "管理员详情",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ID",
                         "name": "id",
@@ -104,6 +118,13 @@ const docTemplate = `{
                 ],
                 "summary": "管理员列表",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "用户名",
@@ -154,6 +175,13 @@ const docTemplate = `{
                 "summary": "禁用或启用管理员",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ID",
                         "name": "id",
@@ -183,6 +211,13 @@ const docTemplate = `{
                 ],
                 "summary": "删除管理员",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ID",
@@ -238,6 +273,84 @@ const docTemplate = `{
                         "description": "页大小",
                         "name": "size",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/file/mutiple/upload": {
+            "post": {
+                "description": "多文件上传",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "多文件上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "文件",
+                        "name": "uploadfiles",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/file/upload": {
+            "post": {
+                "description": "单文件上传",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "单文件上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "文件",
+                        "name": "uploadfile",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -313,6 +426,282 @@ const docTemplate = `{
                 "msg": {},
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "global.LocalTime": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.Ability": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AdminUser": {
+            "type": "object",
+            "properties": {
+                "ability": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Ability"
+                    }
+                },
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "id": {
+                    "description": "gorm.Model",
+                    "type": "integer"
+                },
+                "menus": {
+                    "description": "所有菜单和接口",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Menu"
+                    }
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "realname": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Role"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "super_admin": {
+                    "description": "是否超级管理员",
+                    "type": "boolean"
+                },
+                "unique_auth_keys": {
+                    "description": "所有鉴权key",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updated_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Menu": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "description": "前端鉴权key",
+                    "type": "string"
+                },
+                "api_path": {
+                    "description": "接口路径",
+                    "type": "string"
+                },
+                "checked": {
+                    "description": "是否选中，角色接口中用",
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "expand": {
+                    "type": "boolean"
+                },
+                "header": {
+                    "type": "string"
+                },
+                "html": {
+                    "description": "用来输出层级 |----",
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "gorm.Model",
+                    "type": "integer"
+                },
+                "is_header": {
+                    "type": "integer"
+                },
+                "menu_path": {
+                    "description": "前端菜单路径",
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "p_id": {
+                    "type": "integer"
+                },
+                "selected": {
+                    "type": "boolean"
+                },
+                "sort": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1显示 -1隐藏",
+                    "type": "integer"
+                },
+                "subject": {
+                    "description": "前端鉴权key",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "unique_auth_key": {
+                    "description": "前端鉴权key",
+                    "type": "string"
+                }
+            }
+        },
+        "model.MenuTree": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "description": "前端鉴权key",
+                    "type": "string"
+                },
+                "api_path": {
+                    "description": "接口路径",
+                    "type": "string"
+                },
+                "checked": {
+                    "description": "是否选中，角色接口中用",
+                    "type": "boolean"
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.MenuTree"
+                    }
+                },
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "expand": {
+                    "type": "boolean"
+                },
+                "header": {
+                    "type": "string"
+                },
+                "html": {
+                    "description": "用来输出层级 |----",
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "gorm.Model",
+                    "type": "integer"
+                },
+                "is_header": {
+                    "type": "integer"
+                },
+                "menu_path": {
+                    "description": "前端菜单路径",
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "p_id": {
+                    "type": "integer"
+                },
+                "selected": {
+                    "type": "boolean"
+                },
+                "sort": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "1显示 -1隐藏",
+                    "type": "integer"
+                },
+                "subject": {
+                    "description": "前端鉴权key",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "unique_auth_key": {
+                    "description": "前端鉴权key",
+                    "type": "string"
+                }
+            }
+        },
+        "model.Role": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "id": {
+                    "description": "gorm.Model",
+                    "type": "integer"
+                },
+                "jump_page": {
+                    "description": "登录后跳转页面",
+                    "type": "string"
+                },
+                "menu_ids": {
+                    "description": "菜单IDS",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "menu_names": {
+                    "description": "菜单名，用 逗号 分隔",
+                    "type": "string"
+                },
+                "menus_tree": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.MenuTree"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "tag": {
+                    "type": "string"
                 }
             }
         },

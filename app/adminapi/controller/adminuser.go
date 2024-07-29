@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:28:08
- * @LastEditTime: 2024-07-29 11:27:27
+ * @LastEditTime: 2024-07-29 17:24:57
  */
 package controller
 
@@ -36,11 +36,12 @@ func (au *AdminUser) BeforeActivation(b mvc.BeforeActivation) {
 // @Description	管理员列表
 // @Accept		json
 // @Produce		json
+// @Param		Authorization	header		string	true	"token"
 // @Param		username query string false	"用户名"
 // @Param		status   query int    false	"状态"
 // @Param		page     query string false	"页码"
 // @Param		size     query int    false	"页大小"
-// @Success		200		{object}	app.Response		""
+// @Success		200		{object}	model.AdminUser		""
 // @Failure		200		{object}	app.Response	    ""
 // @Router		/adminapi/adminuser/list [get]
 func (au *AdminUser) GetAdminuserList() {
@@ -89,8 +90,9 @@ func (au *AdminUser) GetAdminuserList() {
 // @Description	管理员详情
 // @Accept		json
 // @Produce		json
+// @Param		Authorization	header		string	true	"token"
 // @Param		id path int true	"ID"
-// @Success		200		{object}	app.Response		""
+// @Success		200		{object}	model.AdminUser		""
 // @Failure		200		{object}	app.Response	    ""
 // @Router		/adminapi/adminuser/info/{id} [get]
 func (au *AdminUser) GetAdminuserInfoBy(id uint32) {
@@ -109,6 +111,7 @@ func (au *AdminUser) GetAdminuserInfoBy(id uint32) {
 // @Description	创建或更新管理员
 // @Accept		json
 // @Produce		json
+// @Param		Authorization	header		string	true	"token"
 // @Param		account	body		validate.CreateUpdateAdminUserRequest	true	"请求体"
 // @Success		200		{object}	app.Response		""
 // @Failure		200		{object}	app.Response	    ""
@@ -159,6 +162,7 @@ func (au *AdminUser) PostAdminuser() {
 // @Description	删除管理员
 // @Accept		json
 // @Produce		json
+// @Param		Authorization	header		string	true	"token"
 // @Param		id path int true	"ID"
 // @Success		200		{object}	app.Response		""
 // @Failure		200		{object}	app.Response	    ""
@@ -191,6 +195,7 @@ func (au *AdminUser) DeleteAdminuserBy(id uint32) {
 // @Description	禁用或启用管理员
 // @Accept		json
 // @Produce		json
+// @Param		Authorization	header		string	true	"token"
 // @Param		id path int true	"ID"
 // @Success		200		{object}	app.Response		""
 // @Failure		200		{object}	app.Response	    ""

@@ -56,6 +56,197 @@ definitions:
       success:
         type: boolean
     type: object
+  global.LocalTime:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  model.Ability:
+    properties:
+      action:
+        type: string
+      subject:
+        type: string
+    type: object
+  model.AdminUser:
+    properties:
+      ability:
+        items:
+          $ref: '#/definitions/model.Ability'
+        type: array
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      id:
+        description: gorm.Model
+        type: integer
+      menus:
+        description: 所有菜单和接口
+        items:
+          $ref: '#/definitions/model.Menu'
+        type: array
+      phone:
+        type: string
+      realname:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+      status:
+        type: integer
+      super_admin:
+        description: 是否超级管理员
+        type: boolean
+      unique_auth_keys:
+        description: 所有鉴权key
+        items:
+          type: string
+        type: array
+      updated_at:
+        $ref: '#/definitions/global.LocalTime'
+      username:
+        type: string
+    type: object
+  model.Menu:
+    properties:
+      action:
+        description: 前端鉴权key
+        type: string
+      api_path:
+        description: 接口路径
+        type: string
+      checked:
+        description: 是否选中，角色接口中用
+        type: boolean
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      expand:
+        type: boolean
+      header:
+        type: string
+      html:
+        description: 用来输出层级 |----
+        type: string
+      icon:
+        type: string
+      id:
+        description: gorm.Model
+        type: integer
+      is_header:
+        type: integer
+      menu_path:
+        description: 前端菜单路径
+        type: string
+      method:
+        type: string
+      p_id:
+        type: integer
+      selected:
+        type: boolean
+      sort:
+        type: integer
+      status:
+        description: 1显示 -1隐藏
+        type: integer
+      subject:
+        description: 前端鉴权key
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      unique_auth_key:
+        description: 前端鉴权key
+        type: string
+    type: object
+  model.MenuTree:
+    properties:
+      action:
+        description: 前端鉴权key
+        type: string
+      api_path:
+        description: 接口路径
+        type: string
+      checked:
+        description: 是否选中，角色接口中用
+        type: boolean
+      children:
+        items:
+          $ref: '#/definitions/model.MenuTree'
+        type: array
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      expand:
+        type: boolean
+      header:
+        type: string
+      html:
+        description: 用来输出层级 |----
+        type: string
+      icon:
+        type: string
+      id:
+        description: gorm.Model
+        type: integer
+      is_header:
+        type: integer
+      menu_path:
+        description: 前端菜单路径
+        type: string
+      method:
+        type: string
+      p_id:
+        type: integer
+      selected:
+        type: boolean
+      sort:
+        type: integer
+      status:
+        description: 1显示 -1隐藏
+        type: integer
+      subject:
+        description: 前端鉴权key
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      unique_auth_key:
+        description: 前端鉴权key
+        type: string
+    type: object
+  model.Role:
+    properties:
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      id:
+        description: gorm.Model
+        type: integer
+      jump_page:
+        description: 登录后跳转页面
+        type: string
+      menu_ids:
+        description: 菜单IDS
+        items:
+          type: integer
+        type: array
+      menu_names:
+        description: 菜单名，用 逗号 分隔
+        type: string
+      menus_tree:
+        items:
+          $ref: '#/definitions/model.MenuTree'
+        type: array
+      name:
+        type: string
+      status:
+        type: integer
+      tag:
+        type: string
+    type: object
   validate.CreateUpdateAdminUserRequest:
     properties:
       id:
@@ -106,6 +297,11 @@ paths:
       - application/json
       description: 创建或更新管理员
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 请求体
         in: body
         name: account
@@ -128,6 +324,11 @@ paths:
       - application/json
       description: 删除管理员
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ID
         in: path
         name: id
@@ -148,6 +349,11 @@ paths:
       - application/json
       description: 禁用或启用管理员
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ID
         in: path
         name: id
@@ -169,6 +375,11 @@ paths:
       - application/json
       description: 管理员详情
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ID
         in: path
         name: id
@@ -190,6 +401,11 @@ paths:
       - application/json
       description: 管理员列表
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 用户名
         in: query
         name: username
@@ -248,4 +464,56 @@ paths:
       summary: 配置列表
       tags:
       - 配置
+  /adminapi/file/mutiple/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 多文件上传
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: uploadfiles
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 多文件上传
+      tags:
+      - 文件
+  /adminapi/file/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 单文件上传
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: uploadfile
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 单文件上传
+      tags:
+      - 文件
 swagger: "2.0"
