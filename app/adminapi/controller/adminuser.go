@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:28:08
- * @LastEditTime: 2023-02-01 16:01:37
+ * @LastEditTime: 2024-07-29 11:27:27
  */
 package controller
 
@@ -31,7 +31,18 @@ func (au *AdminUser) BeforeActivation(b mvc.BeforeActivation) {
 	b.Dependencies().Register(GetAuthAdminUser)
 }
 
-// GetAdminuserList 管理员列表
+// @Tags        管理员
+// @Summary		管理员列表
+// @Description	管理员列表
+// @Accept		json
+// @Produce		json
+// @Param		username query string false	"用户名"
+// @Param		status   query int    false	"状态"
+// @Param		page     query string false	"页码"
+// @Param		size     query int    false	"页大小"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/adminuser/list [get]
 func (au *AdminUser) GetAdminuserList() {
 	page, size := app.Pager(au.Ctx)
 
@@ -73,7 +84,15 @@ func (au *AdminUser) GetAdminuserList() {
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", app.List{List: adminUsers, Total: total}))
 }
 
-// GetAdminuserInfoBy 获取管理员详情
+// @Tags        管理员
+// @Summary		管理员详情
+// @Description	管理员详情
+// @Accept		json
+// @Produce		json
+// @Param		id path int true	"ID"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/adminuser/info/{id} [get]
 func (au *AdminUser) GetAdminuserInfoBy(id uint32) {
 	adminUser := new(model.AdminUser)
 	adminUser.ID = id
@@ -85,7 +104,15 @@ func (au *AdminUser) GetAdminuserInfoBy(id uint32) {
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", *adminUser))
 }
 
-// PostAdminuser 创建或更新管理员
+// @Tags        管理员
+// @Summary		创建或更新管理员
+// @Description	创建或更新管理员
+// @Accept		json
+// @Produce		json
+// @Param		account	body		validate.CreateUpdateAdminUserRequest	true	"请求体"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/adminuser [post]
 func (au *AdminUser) PostAdminuser() {
 	postInfo := new(validate.CreateUpdateAdminUserRequest)
 
@@ -127,7 +154,15 @@ func (au *AdminUser) PostAdminuser() {
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
-// DeleteAdminuserBy 删除管理员
+// @Tags        管理员
+// @Summary		删除管理员
+// @Description	删除管理员
+// @Accept		json
+// @Produce		json
+// @Param		id path int true	"ID"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/adminuser/{id} [delete]
 func (au *AdminUser) DeleteAdminuserBy(id uint32) {
 	adminUser := new(model.AdminUser)
 	adminUser.ID = id
@@ -151,7 +186,15 @@ func (au *AdminUser) DeleteAdminuserBy(id uint32) {
 	au.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
-// GetAdminuserStatusBy 禁用或启用管理员
+// @Tags        管理员
+// @Summary		禁用或启用管理员
+// @Description	禁用或启用管理员
+// @Accept		json
+// @Produce		json
+// @Param		id path int true	"ID"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/adminuser/{id} [get]
 func (au *AdminUser) GetAdminuserStatusBy(id uint32) {
 	adminUser := new(model.AdminUser)
 	adminUser.ID = id

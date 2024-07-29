@@ -1,0 +1,251 @@
+basePath: /
+definitions:
+  app.Code:
+    enum:
+    - 200
+    - 500
+    - 403
+    - 404
+    - 405
+    - 406
+    - 407
+    - 999
+    - 1000
+    - 1001
+    - 1002
+    - 1003
+    - 1004
+    - 1005
+    - 1006
+    - 2000
+    - 2001
+    - 2002
+    - 2003
+    - 5000
+    type: integer
+    x-enum-comments:
+      CodeCustom: 自定义错误
+      CodeNotAllowed: 没有权限
+    x-enum-varnames:
+    - CodeSucceed
+    - CodeFailed
+    - CodeForbidden
+    - CodeNotFound
+    - CodeRequestParamError
+    - CodeDataHasRelation
+    - CodeDisabled
+    - CodeCustom
+    - CodeUserLoginSucceed
+    - CodeUserRegisterSucceed
+    - CodeUserRegisterFailed
+    - CodeUserNotFound
+    - CodeUserPasswordError
+    - CodeUserForbidden
+    - CodeVerifycodeSucceed
+    - CodeTokenExpired
+    - CodeRefreshTokenExpired
+    - CodeRefreshTokenInvalidated
+    - CodeUserHasBeenLogin
+    - CodeNotAllowed
+  app.Response:
+    properties:
+      code:
+        $ref: '#/definitions/app.Code'
+      data: {}
+      msg: {}
+      success:
+        type: boolean
+    type: object
+  validate.CreateUpdateAdminUserRequest:
+    properties:
+      id:
+        type: integer
+      password:
+        maxLength: 50
+        minLength: 4
+        type: string
+      phone:
+        type: string
+      realname:
+        maxLength: 50
+        minLength: 2
+        type: string
+      role_ids:
+        items:
+          type: integer
+        type: array
+      status:
+        type: integer
+      username:
+        maxLength: 50
+        minLength: 2
+        type: string
+    required:
+    - phone
+    - realname
+    - role_ids
+    - username
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: 356126067@qq.com
+    name: heyongliang
+    url: http://xxx.com
+  description: windows编译：go build -ldflags "-s -w -H=windowsgui" -o=iris-project-daemon.exe
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: 项目接口文档
+  version: "1.0"
+paths:
+  /adminapi/adminuser:
+    post:
+      consumes:
+      - application/json
+      description: 创建或更新管理员
+      parameters:
+      - description: 请求体
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/validate.CreateUpdateAdminUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 创建或更新管理员
+      tags:
+      - 管理员
+  /adminapi/adminuser/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除管理员
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 删除管理员
+      tags:
+      - 管理员
+    get:
+      consumes:
+      - application/json
+      description: 禁用或启用管理员
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 禁用或启用管理员
+      tags:
+      - 管理员
+  /adminapi/adminuser/info/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 管理员详情
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员详情
+      tags:
+      - 管理员
+  /adminapi/adminuser/list:
+    get:
+      consumes:
+      - application/json
+      description: 管理员列表
+      parameters:
+      - description: 用户名
+        in: query
+        name: username
+        type: string
+      - description: 状态
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: string
+      - description: 页大小
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员列表
+      tags:
+      - 管理员
+  /adminapi/config/list:
+    get:
+      consumes:
+      - application/json
+      description: 配置列表
+      parameters:
+      - description: 名称
+        in: query
+        name: name
+        type: string
+      - description: 状态
+        in: query
+        name: type
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: string
+      - description: 页大小
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 配置列表
+      tags:
+      - 配置
+swagger: "2.0"

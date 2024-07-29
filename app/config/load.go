@@ -19,6 +19,7 @@ var (
 	// App 项目配置
 	App = struct {
 		Appname    string
+		Env        string
 		Fronturl   string
 		HTTPS      bool
 		Certpath   string

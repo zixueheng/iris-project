@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2022-11-05 15:33:06
+ * @LastEditTime: 2024-07-29 11:03:28
  */
 package util
 
@@ -448,14 +448,14 @@ func GeoDistance(lng1 float64, lat1 float64, lng2 float64, lat2 float64) float64
 }
 
 // BackupMySQLDb 备份MySql数据库（确保 mysqldump 在系统PATH中）
-// @param 	host: 			数据库地址: localhost
-// @param 	port:			端口: 3306
-// @param 	user:			用户名: root
-// @param 	password:		密码: root
-// @param 	databaseName:	需要被分的数据库名: test
-// @param 	tableName:		需要备份的表名: user
-// @param 	sqlPath:		备份SQL存储路径: D:/backup/test/
-// @return 	backupPath
+// param 	host: 			数据库地址: localhost
+// param 	port:			端口: 3306
+// param 	user:			用户名: root
+// param 	password:		密码: root
+// param 	databaseName:	需要被分的数据库名: test
+// param 	tableName:		需要备份的表名: user
+// param 	sqlPath:		备份SQL存储路径: D:/backup/test/
+// return 	backupPath
 func BackupMySQLDb(host, port, user, password, databaseName, tableName, sqlPath string) (string, error) {
 	var cmd *exec.Cmd
 

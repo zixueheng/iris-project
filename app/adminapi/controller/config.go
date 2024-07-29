@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-03-09 16:15:38
- * @LastEditTime: 2022-10-10 14:36:53
+ * @LastEditTime: 2024-07-29 14:30:41
  */
 package controller
 
@@ -43,7 +43,18 @@ func (c *Config) GetConfigImportTemplates() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", templates))
 }
 
-// GetConfigList banner列表
+// @Tags        配置
+// @Summary		配置列表
+// @Description	配置列表
+// @Accept		json
+// @Produce		json
+// @Param		name     query string false	"名称"
+// @Param		type     query int    false	"状态"
+// @Param		page     query string false	"页码"
+// @Param		size     query int    false	"页大小"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/config/list [get]
 func (c *Config) GetConfigList() {
 	page, size := app.Pager(c.Ctx)
 

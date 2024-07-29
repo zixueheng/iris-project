@@ -1,4 +1,5 @@
 appname: iris-project # 金美亚建材
+env: pro # 环境：dev 开发、 test 测试、 pro 生产
 fronturl: https://iris-project.myyll.com # 前端地址
 https: false
 certpath:

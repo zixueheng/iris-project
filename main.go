@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2024-03-15 17:10:54
+ * @LastEditTime: 2024-07-29 15:48:24
  */
 package main
 
@@ -12,6 +12,7 @@ import (
 	// stdContext "context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"time"
 
@@ -23,13 +24,36 @@ import (
 
 	"iris-project/routes"
 
+	// Swag 命令生成的目录 (swag init), 必须要导入
+	// swag init --parseDependency --parseInternal
+	_ "iris-project/docs"
+
 	// "github.com/joho/godotenv"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
 )
 
-// windows编译 go build -ldflags "-s -w -H=windowsgui" -o=iris-project-daemon.exe
+// 编译时可以排除swagger文档，以达到缩小包的尺寸的目的（副作用 go run 的时候不包含文档，只能使用gowatch，查看gowatch.yml）
+// go build （不包含文档）
+// go build -tags "docs"（包含文档）
+var swaggerUI context.Handler
+
+// @title		    项目接口文档
+// @version		    1.0
+// @description	    windows编译：go build -ldflags "-s -w -H=windowsgui" -o=iris-project-daemon.exe
+// @termsOfService	http://swagger.io/terms/
+//
+// @contact.name	heyongliang
+// @contact.url	    http://xxx.com
+// @contact.email	356126067@qq.com
+//
+// @license.name	Apache 2.0
+// @license.url	    http://www.apache.org/licenses/LICENSE-2.0.html
+//
+// @host		    localhost:8080
+// @BasePath	    /
 func main() {
 	// err := godotenv.Load()
 	// if err != nil {
@@ -56,6 +80,17 @@ func main() {
 	middleware.InitWebSocket(app) // 普通方式，mvc方式查看routes
 	middleware.InitCron()         // 启动定时任务
 	routes.InitRoute(app)         // 加载路由
+
+	if swaggerUI != nil {
+		log.Println("已加载swagger文档")
+		// Register on http://localhost:8080/swagger
+		app.Get("/swagger", swaggerUI)
+		// And the wildcard one for index.html, *.js, *.css and e.t.c.
+		app.Get("/swagger/{any:path}", swaggerUI)
+	} else {
+		log.Println("未加载swagger文档")
+	}
+
 	// app.Listen(":8080")
 
 	if config.App.HTTPS {
