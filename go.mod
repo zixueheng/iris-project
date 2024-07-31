@@ -123,7 +123,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.15.0 // indirect
 	github.com/prometheus/procfs v0.2.0 // indirect
-	github.com/rabbitmq/amqp091-go v1.6.1
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
 	github.com/shirou/gopsutil/v3 v3.23.2 // indirect

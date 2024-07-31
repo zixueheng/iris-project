@@ -10,14 +10,14 @@ package main
 
 import (
 	"fmt"
-	"iris-project/lib/mq"
+	mq "iris-project/lib/mq2"
 	"log"
 	"time"
 )
 
 // 生产者
 func main() {
-	rabbit := mq.NewRabbitMQ("yoyo_exchange", "yoyo_route", "yoyo_queue")
+	rabbit := mq.NewRabbitMQ("yoyo_exchange", "direct", "yoyo_route", "yoyo_queue")
 	defer rabbit.Close()
 
 	for i := 1; i <= 3; i++ {

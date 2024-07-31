@@ -110,6 +110,88 @@ definitions:
       username:
         type: string
     type: object
+  model.File:
+    properties:
+      category_id:
+        type: integer
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      file_mime:
+        type: string
+      filename:
+        type: string
+      full_path:
+        type: string
+      id:
+        type: integer
+      is_favor:
+        enum:
+        - 1
+        - -1
+        type: integer
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+      storage:
+        type: string
+      type:
+        type: string
+      upload_by:
+        type: string
+      upload_by_id:
+        type: integer
+    required:
+    - filename
+    - name
+    - path
+    type: object
+  model.FileCategory:
+    properties:
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      html:
+        description: 用来输出层级 |----
+        type: string
+      p_id:
+        type: integer
+      selected:
+        type: boolean
+      title:
+        description: json:"name"
+        type: string
+      value:
+        description: json:"id"
+        type: integer
+    required:
+    - title
+    type: object
+  model.FileCategoryTree:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/model.FileCategoryTree'
+        type: array
+      created_at:
+        $ref: '#/definitions/global.LocalTime'
+      html:
+        description: 用来输出层级 |----
+        type: string
+      p_id:
+        type: integer
+      selected:
+        type: boolean
+      title:
+        description: json:"name"
+        type: string
+      value:
+        description: json:"id"
+        type: integer
+    required:
+    - title
+    type: object
   model.Menu:
     properties:
       action:
@@ -464,6 +546,132 @@ paths:
       summary: 配置列表
       tags:
       - 配置
+  /adminapi/file:
+    delete:
+      consumes:
+      - application/json
+      description: 删除文件
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求体，格式：{ids:[1,2]}
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 删除文件
+      tags:
+      - 文件
+  /adminapi/file/category:
+    put:
+      consumes:
+      - application/json
+      description: 更改文件分类
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求体，格式：{ids:[1,2],name:新名称}
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 更改文件分类
+      tags:
+      - 文件
+  /adminapi/file/favor:
+    put:
+      consumes:
+      - application/json
+      description: 收藏或取消收藏文件
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求体，格式：{file_id:1}
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 收藏或取消收藏文件
+      tags:
+      - 文件
+  /adminapi/file/list:
+    get:
+      consumes:
+      - application/json
+      description: 文件列表
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 分类ID
+        in: query
+        name: category_id
+        type: string
+      - description: 类型
+        in: query
+        name: type
+        type: string
+      - description: 名称
+        in: query
+        name: name
+        type: string
+      - description: 是否收藏
+        in: query
+        name: is_favor
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: string
+      - description: 页大小
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 文件列表
+      tags:
+      - 文件
   /adminapi/file/mutiple/upload:
     post:
       consumes:
@@ -490,6 +698,33 @@ paths:
       summary: 多文件上传
       tags:
       - 文件
+  /adminapi/file/name:
+    put:
+      consumes:
+      - application/json
+      description: 修改文件名
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求体，格式：{file_id:1,name:新名称}
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 修改文件名
+      tags:
+      - 文件
   /adminapi/file/upload:
     post:
       consumes:
@@ -514,6 +749,101 @@ paths:
           schema:
             $ref: '#/definitions/app.Response'
       summary: 单文件上传
+      tags:
+      - 文件
+  /adminapi/filecategory:
+    post:
+      consumes:
+      - application/json
+      description: 创建或更新文件分类
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求体
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/model.FileCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 创建或更新文件分类
+      tags:
+      - 文件
+  /adminapi/filecategory/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除文件分类
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 删除文件分类
+      tags:
+      - 文件
+  /adminapi/filecategory/select:
+    get:
+      consumes:
+      - application/json
+      description: 文件分类选择项
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 文件分类选择项
+      tags:
+      - 文件
+  /adminapi/filecategory/tree:
+    get:
+      consumes:
+      - application/json
+      description: 文件分类树
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 文件分类树
       tags:
       - 文件
 swagger: "2.0"

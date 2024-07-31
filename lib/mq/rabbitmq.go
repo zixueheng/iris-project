@@ -1,9 +1,16 @@
+/*
+ * @Description: The program is written by the author, if modified at your own risk.
+ * @Author: heyongliang
+ * @Email: 356126067@qq.com
+ * @Phone: 15215657185
+ * @Date: 2024-07-31 10:16:10
+ * @LastEditTime: 2024-07-31 15:42:57
+ */
 package mq
 
 import (
 	"context"
-	"fmt"
-	"iris-project/app/config"
+	"iris-project/global"
 	"log"
 	"strconv"
 	"time"
@@ -11,60 +18,88 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-// 消息体：DelayTime 仅在 SendDelayMessage 方法有效
-type Message struct {
-	DelayTime int // desc:延迟时间(秒)
-	Body      string
+func GetConn() *amqp.Connection {
+	return global.MqConn
 }
 
-type MessageQueue struct {
-	conn         *amqp.Connection // amqp链接对象
-	ch           *amqp.Channel    // channel对象
-	ExchangeName string           // 交换器名称
-	RouteKey     string           // 路由名称
-	QueueName    string           // 队列名称
+// CloseConn 关闭连接
+func CloseConn() {
+	GetConn().Close()
 }
 
-// 消费者回调方法
-type Consumer func(amqp.Delivery)
+// CloseChannel 打开一个新通道
+func OpenChannel() (*amqp.Channel, error) {
+	return GetConn().Channel()
+}
 
-// NewRabbitMQ 新建 rabbitmq 实例
-func NewRabbitMQ(exchange, route, queue string) MessageQueue {
-	var messageQueue = MessageQueue{
-		ExchangeName: exchange,
-		RouteKey:     route,
-		QueueName:    queue,
+// CloseChannel 关闭通道
+func CloseChannel(channel *amqp.Channel) {
+	channel.Close()
+}
+
+// 交换机类型
+const (
+	DirectType  = "direct"
+	FanoutType  = "fanout"
+	TopicType   = "topic"
+	HeadersType = "headers"
+)
+
+type (
+	// 消息体：DelayTime 仅在 SendDelayMessage 方法有效
+	Message struct {
+		DelaySecond int // desc:延迟时间(秒)
+		Body        string
 	}
 
-	rabbitURL := fmt.Sprintf("amqp://%s:%s@%s:%d/",
-		config.RabbitMQ.Username,
-		config.RabbitMQ.Password,
-		config.RabbitMQ.IP,
-		config.RabbitMQ.Port,
-	)
+	MessageQueue struct {
+		ExchangeName string // 交换器名称
+		ExchangeKind string // 交换器类型 direct, fanout, topic, headers
+		RouteKey     string // 路由名称
+		QueueName    string // 队列名称
+	}
 
-	// 建立amqp链接
-	conn, err := amqp.Dial(rabbitURL)
-	failOnError(err, "Failed to connect to RabbitMQ")
-	messageQueue.conn = conn
+	// 消费者回调方法
+	Consumer func(amqp.Delivery)
+)
 
-	// 建立channel通道
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	messageQueue.ch = ch
+func New(exchangeName, exchangeKind, routeKey, queueName string) (*MessageQueue, error) {
+	var mq = &MessageQueue{
+		ExchangeName: exchangeName,
+		ExchangeKind: exchangeKind,
+		RouteKey:     routeKey,
+		QueueName:    queueName,
+	}
 
-	// 声明exchange交换器
-	messageQueue.declareExchange(exchange, nil)
+	channel, err := OpenChannel()
+	if err != nil {
+		log.Printf("打开通道失败：%s\n", err.Error())
+		return nil, err
+	}
+	defer CloseChannel(channel)
 
-	return messageQueue
+	if err := mq.declareExchange(channel, exchangeName, exchangeKind, nil); err != nil {
+		return nil, err
+	}
+
+	return mq, nil
 }
 
 // SendMessage 发送普通消息
-func (mq *MessageQueue) SendMessage(message Message) {
+// 注意每次打开一个新通道用完即关闭，如大批量发送消息考虑使用一个已打开的通道
+func (mq *MessageQueue) SendMessage(message Message) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := mq.ch.PublishWithContext(ctx,
+	channel, err := OpenChannel()
+	if err != nil {
+		log.Printf("打开通道失败：%s\n", err.Error())
+		return err
+	}
+	defer CloseChannel(channel)
+
+	log.Printf("发送消息：%s\n", message.Body)
+	err = channel.PublishWithContext(ctx,
 		mq.ExchangeName, // exchange
 		mq.RouteKey,     // route key
 		false,
@@ -74,34 +109,48 @@ func (mq *MessageQueue) SendMessage(message Message) {
 			Body:        []byte(message.Body),
 		},
 	)
-	failOnError(err, "send common msg err")
+	return err
 }
 
 // SendDelayMessage 发送延迟消息
-func (mq *MessageQueue) SendDelayMessage(message Message) {
-	// delayQueueName := mq.QueueName + "_delay:" + strconv.Itoa(message.DelayTime)
-	// delayRouteKey := mq.RouteKey + "_delay:" + strconv.Itoa(message.DelayTime)
+// 注意每次打开一个新通道用完即关闭，如大批量发送消息考虑使用一个已打开的通道
+func (mq *MessageQueue) SendDelayMessage(message Message) error {
 
 	delayQueueName := mq.QueueName + "_delay"
 	delayRouteKey := mq.RouteKey + "_delay"
 
+	channel, err := OpenChannel()
+	if err != nil {
+		log.Printf("打开通道失败：%s\n", err.Error())
+		return err
+	}
+	defer CloseChannel(channel)
+
 	// 定义延迟队列(死信队列)
-	dq := mq.declareQueue(
+	dq, err := mq.declareQueue(
+		channel,
 		delayQueueName,
 		amqp.Table{
-			"x-dead-letter-exchange":    mq.ExchangeName, // 指定死信交换机
-			"x-dead-letter-routing-key": mq.RouteKey,     // 指定死信routing-key
+			"x-dead-letter-exchange":    mq.ExchangeName, // 过期消息exchange
+			"x-dead-letter-routing-key": mq.RouteKey,     // 过期消息routing-key
 		},
 	)
+	if err != nil {
+		return err
+	}
 
 	// 延迟队列绑定到exchange
-	mq.bindQueue(dq.Name, delayRouteKey, mq.ExchangeName)
+	if err := mq.bindQueue(channel, dq.Name, delayRouteKey, mq.ExchangeName); err != nil {
+		return err
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	log.Printf("发送延时消息：%s，%d\n", message.Body, message.DelaySecond)
+
 	// 发送消息，将消息发送到延迟队列，到期后自动路由到正常队列中
-	err := mq.ch.PublishWithContext(ctx,
+	if err := channel.PublishWithContext(ctx,
 		mq.ExchangeName,
 		delayRouteKey,
 		false,
@@ -109,26 +158,42 @@ func (mq *MessageQueue) SendDelayMessage(message Message) {
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(message.Body),
-			Expiration:  strconv.Itoa(message.DelayTime * 1000),
+			Expiration:  strconv.Itoa(message.DelaySecond * 1000),
 		},
-	)
-	failOnError(err, "send delay msg err")
+	); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Consume 获取消费消息
 func (mq *MessageQueue) Consume(fn Consumer) {
+	channel, err := OpenChannel()
+	if err != nil {
+		log.Printf("打开通道失败：%s\n", err.Error())
+		return
+	}
+	// defer CloseChannel(channel) // 消费者不能关闭通道
+
 	// 声明队列
-	q := mq.declareQueue(mq.QueueName, nil)
+	q, err := mq.declareQueue(channel, mq.QueueName, nil)
+	if err != nil {
+		log.Printf("[队列: %s]声明失败：%s\n", mq.QueueName, err.Error())
+		return
+	}
 
 	// 队列绑定到exchange
-	mq.bindQueue(q.Name, mq.RouteKey, mq.ExchangeName)
+	mq.bindQueue(channel, q.Name, mq.RouteKey, mq.ExchangeName)
 
 	// 设置Qos
-	err := mq.ch.Qos(1, 0, false)
-	failOnError(err, "Failed to set QoS")
+	err = channel.Qos(1, 0, false)
+	if err != nil {
+		log.Printf("[队列: %s]Qos设置失败：%s\n", mq.QueueName, err.Error())
+		return
+	}
 
 	// 监听消息
-	msgs, err := mq.ch.Consume(
+	msgs, err := channel.Consume(
 		q.Name, // queue name,
 		"",     // consumer
 		false,  // auto-ack
@@ -137,9 +202,10 @@ func (mq *MessageQueue) Consume(fn Consumer) {
 		false,  // no-wait
 		nil,    // args
 	)
-	failOnError(err, "Failed to register a consumer")
-
-	// forever := make(chan bool), 注册在主进程，不需要阻塞
+	if err != nil {
+		log.Printf("[队列: %s]消费者设置失败：%s\n", mq.QueueName, err.Error())
+		return
+	}
 
 	go func() {
 		for d := range msgs {
@@ -148,19 +214,12 @@ func (mq *MessageQueue) Consume(fn Consumer) {
 		}
 	}()
 
-	log.Printf(" [*] Waiting for logs. To exit press CTRL+C")
-	// <-forever
-}
-
-// Close 关闭链接
-func (mq *MessageQueue) Close() {
-	mq.ch.Close()
-	mq.conn.Close()
+	log.Printf("[队列: %s]等待接受消息\n", mq.QueueName)
 }
 
 // declareQueue 定义队列
-func (mq *MessageQueue) declareQueue(name string, args amqp.Table) amqp.Queue {
-	q, err := mq.ch.QueueDeclare(
+func (mq *MessageQueue) declareQueue(channel *amqp.Channel, name string, args amqp.Table) (amqp.Queue, error) {
+	q, err := channel.QueueDeclare(
 		name,
 		true,
 		false,
@@ -168,40 +227,32 @@ func (mq *MessageQueue) declareQueue(name string, args amqp.Table) amqp.Queue {
 		false,
 		args,
 	)
-	failOnError(err, "Failed to declare a delay_queue")
 
-	return q
+	return q, err
 }
 
 // declareQueue 定义交换器
-func (mq *MessageQueue) declareExchange(exchange string, args amqp.Table) {
-	err := mq.ch.ExchangeDeclare(
+func (mq *MessageQueue) declareExchange(channel *amqp.Channel, exchange, kind string, args amqp.Table) error {
+	err := channel.ExchangeDeclare(
 		exchange,
-		"direct",
+		kind, // direct, fanout, topic, headers
 		true,
 		false,
 		false,
 		false,
 		args,
 	)
-	failOnError(err, "Failed to declare an exchange")
+	return err
 }
 
 // bindQueue 绑定队列
-func (mq *MessageQueue) bindQueue(queue, routekey, exchange string) {
-	err := mq.ch.QueueBind(
+func (mq *MessageQueue) bindQueue(channel *amqp.Channel, queue, routekey, exchange string) error {
+	err := channel.QueueBind(
 		queue,
 		routekey,
 		exchange,
 		false,
 		nil,
 	)
-	failOnError(err, "Failed to bind a queue")
-}
-
-// failOnError 错误处理
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s : %s", msg, err)
-	}
+	return err
 }

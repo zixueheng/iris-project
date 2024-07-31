@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:27:34
- * @LastEditTime: 2024-07-29 15:48:24
+ * @LastEditTime: 2024-07-31 14:24:56
  */
 package main
 
@@ -19,6 +19,7 @@ import (
 	"iris-project/app/config"
 	"iris-project/global"
 	"iris-project/lib/file"
+	"iris-project/lib/mq"
 
 	"iris-project/middleware"
 
@@ -38,6 +39,7 @@ import (
 // 编译时可以排除swagger文档，以达到缩小包的尺寸的目的（副作用 go run 的时候不包含文档，只能使用gowatch，查看gowatch.yml）
 // go build （不包含文档）
 // go build -tags "docs"（包含文档）
+// 经过实际操作生成的文档不好用，格式书写繁琐，实际效果不佳，还是手写接口文档为好
 var swaggerUI context.Handler
 
 // @title		    项目接口文档
@@ -79,6 +81,7 @@ func main() {
 
 	middleware.InitWebSocket(app) // 普通方式，mvc方式查看routes
 	middleware.InitCron()         // 启动定时任务
+	middleware.InitMq()           // 启动消息队列
 	routes.InitRoute(app)         // 加载路由
 
 	if swaggerUI != nil {
@@ -154,6 +157,7 @@ func newApp() *iris.Application {
 
 		middleware.AcLog.Close()
 		middleware.CloseCron()
+		mq.CloseConn()
 
 		// timeout := 10 * time.Second
 		// ctx, cancel := stdContext.WithTimeout(stdContext.Background(), timeout)

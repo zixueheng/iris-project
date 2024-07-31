@@ -279,6 +279,197 @@
                 }
             }
         },
+        "/adminapi/file": {
+            "delete": {
+                "description": "删除文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "删除文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体，格式：{ids:[1,2]}",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/file/category": {
+            "put": {
+                "description": "更改文件分类",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "更改文件分类",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体，格式：{ids:[1,2],name:新名称}",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/file/favor": {
+            "put": {
+                "description": "收藏或取消收藏文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "收藏或取消收藏文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体，格式：{file_id:1}",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/file/list": {
+            "get": {
+                "description": "文件列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "文件列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "分类ID",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "类型",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "名称",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "是否收藏",
+                        "name": "is_favor",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页大小",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/adminapi/file/mutiple/upload": {
             "post": {
                 "description": "多文件上传",
@@ -318,6 +509,47 @@
                 }
             }
         },
+        "/adminapi/file/name": {
+            "put": {
+                "description": "修改文件名",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "修改文件名",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体，格式：{file_id:1,name:新名称}",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/adminapi/file/upload": {
             "post": {
                 "description": "单文件上传",
@@ -344,6 +576,150 @@
                         "description": "文件",
                         "name": "uploadfile",
                         "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/filecategory": {
+            "post": {
+                "description": "创建或更新文件分类",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "创建或更新文件分类",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.FileCategory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/filecategory/select": {
+            "get": {
+                "description": "文件分类选择项",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "文件分类选择项",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/filecategory/tree": {
+            "get": {
+                "description": "文件分类树",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "文件分类树",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/adminapi/filecategory/{id}": {
+            "delete": {
+                "description": "删除文件分类",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件"
+                ],
+                "summary": "删除文件分类",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -500,6 +876,126 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "model.File": {
+            "type": "object",
+            "required": [
+                "filename",
+                "name",
+                "path"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "file_mime": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "full_path": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_favor": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        -1
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "storage": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "upload_by": {
+                    "type": "string"
+                },
+                "upload_by_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.FileCategory": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "html": {
+                    "description": "用来输出层级 |----",
+                    "type": "string"
+                },
+                "p_id": {
+                    "type": "integer"
+                },
+                "selected": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "description": "json:\"name\"",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "json:\"id\"",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.FileCategoryTree": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.FileCategoryTree"
+                    }
+                },
+                "created_at": {
+                    "$ref": "#/definitions/global.LocalTime"
+                },
+                "html": {
+                    "description": "用来输出层级 |----",
+                    "type": "string"
+                },
+                "p_id": {
+                    "type": "integer"
+                },
+                "selected": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "description": "json:\"name\"",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "json:\"id\"",
+                    "type": "integer"
                 }
             }
         },

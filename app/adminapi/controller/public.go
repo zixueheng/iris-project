@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-18 09:34:00
- * @LastEditTime: 2022-09-29 09:44:38
+ * @LastEditTime: 2024-07-31 14:08:29
  */
 package controller
 
@@ -19,6 +19,7 @@ import (
 	"iris-project/app/config"
 	"iris-project/global"
 	"iris-project/lib/cache"
+	"iris-project/lib/mq"
 	"iris-project/lib/util"
 	"iris-project/middleware"
 	"time"
@@ -233,5 +234,29 @@ func (p *Public) GetCheckAuth() {
 
 // GetAuth ...
 func (p *Public) GetAuth() {
+	p.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
+}
+
+func (p *Public) PostMqTest() {
+
+	param := struct {
+		Msg    string `json:"msg"`
+		Second int    `json:"second"`
+	}{}
+
+	if err := p.Ctx.ReadJSON(&param); err != nil {
+		p.Ctx.JSON(app.APIData(false, app.CodeRequestParamError, "", nil))
+		return
+	}
+	var err error
+	if param.Second == 0 {
+		err = middleware.MqDirect.SendMessage(mq.Message{Body: param.Msg})
+	} else {
+		err = middleware.MqDirect.SendDelayMessage(mq.Message{Body: param.Msg, DelaySecond: param.Second})
+	}
+	if err != nil {
+		p.Ctx.JSON(app.APIData(false, app.CodeCustom, err.Error(), nil))
+		return
+	}
 	p.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }

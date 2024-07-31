@@ -10,7 +10,7 @@ package main
 
 import (
 	"fmt"
-	"iris-project/lib/mq"
+	mq "iris-project/lib/mq2"
 	"log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -23,7 +23,7 @@ func main() {
 	for i := 1; i <= 3; i++ {
 		go func(i int) {
 			// 新建连接
-			rabbit := mq.NewRabbitMQ("yoyo_exchange", "yoyo_route", "yoyo_queue")
+			rabbit := mq.NewRabbitMQ("yoyo_exchange", "direct", "yoyo_route", "yoyo_queue")
 			// 一般来说消费者不关闭，常驻进程进行消息消费处理
 			// defer rabbit.Close()
 

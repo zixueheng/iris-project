@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-01 11:28:08
- * @LastEditTime: 2024-07-29 17:09:52
+ * @LastEditTime: 2024-07-30 10:03:09
  */
 package controller
 
@@ -138,7 +138,21 @@ func (c *File) PostFileMutipleUpload() {
 	}
 }
 
-// GetFileList 文件列表
+// @Tags        文件
+// @Summary		文件列表
+// @Description	文件列表
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		category_id     query       string  false	"分类ID"
+// @Param		type            query       string  false	"类型"
+// @Param		name            query       string  false	"名称"
+// @Param		is_favor        query       int     false	"是否收藏"
+// @Param		page            query       string  false	"页码"
+// @Param		size            query       int     false	"页大小"
+// @Success		200		{object}	appmodel.File		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file/list [get]
 func (c *File) GetFileList() {
 	page, size := app.Pager(c.Ctx)
 
@@ -204,7 +218,16 @@ func (c *File) GetFileList() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", app.List{List: list, Total: total, Statistic: statistic}))
 }
 
-// PutFileFavor 收藏或取消收藏文件
+// @Tags        文件
+// @Summary		收藏或取消收藏文件
+// @Description	收藏或取消收藏文件
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		request	body		string	true	"请求体，格式：{file_id:1}"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file/favor [put]
 func (c *File) PutFileFavor() {
 	type Request struct {
 		FileID uint32 `json:"file_id" validate:"required"`
@@ -229,7 +252,16 @@ func (c *File) PutFileFavor() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
-// PutFileName 修改文件名
+// @Tags        文件
+// @Summary		修改文件名
+// @Description	修改文件名
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		request	body		string	true	"请求体，格式：{file_id:1,name:新名称}"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file/name [put]
 func (c *File) PutFileName() {
 	type Request struct {
 		FileID uint32 `json:"file_id" validate:"required"`
@@ -255,7 +287,16 @@ func (c *File) PutFileName() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
-// PutFileCategory 更改文件分类
+// @Tags        文件
+// @Summary		更改文件分类
+// @Description	更改文件分类
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		request	body		string	true	"请求体，格式：{ids:[1,2],name:新名称}"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file/category [put]
 func (c *File) PutFileCategory() {
 	type Request struct {
 		IDs        []uint32 `json:"ids" validate:"required,min=1"`
@@ -275,7 +316,16 @@ func (c *File) PutFileCategory() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
-// DeleteFile 删除文件
+// @Tags        文件
+// @Summary		删除文件
+// @Description	删除文件
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		request	body		string	true	"请求体，格式：{ids:[1,2]}"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/file [delete]
 func (c *File) DeleteFile() {
 	type Request struct {
 		IDs []uint32 `json:"ids" validate:"required,min=1"`
@@ -290,12 +340,28 @@ func (c *File) DeleteFile() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", map[string]interface{}{"deleted": deleted}))
 }
 
-// GetFilecategoryTree 文件分类树
+// @Tags        文件
+// @Summary		文件分类树
+// @Description	文件分类树
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Success		200		{object}	appmodel.FileCategoryTree		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/filecategory/tree [get]
 func (c *File) GetFilecategoryTree() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", appmodel.GetFileCategoryTree()))
 }
 
-// GetFilecategorySelect 文件分类选择项
+// @Tags        文件
+// @Summary		文件分类选择项
+// @Description	文件分类选择项
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Success		200		{object}	appmodel.FileCategory		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/filecategory/select [get]
 func (c *File) GetFilecategorySelect() {
 	var list []*appmodel.FileCategory
 	dao.FindAll(nil, &list, nil)
@@ -319,7 +385,16 @@ func (c *File) GetFilecategorySelect() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", box))
 }
 
-// PostFilecategory 创建或更新文件分类
+// @Tags        文件
+// @Summary		创建或更新文件分类
+// @Description	创建或更新文件分类
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		account	body		appmodel.FileCategory	true	"请求体"
+// @Success		200		{object}	app.Response		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/filecategory [post]
 func (c *File) PostFilecategory() {
 	var category dao.Model = &appmodel.FileCategory{}
 
@@ -337,7 +412,16 @@ func (c *File) PostFilecategory() {
 	c.Ctx.JSON(app.APIData(true, app.CodeSucceed, "", nil))
 }
 
-// DeleteFilecategoryBy 删除文件分类
+// @Tags        文件
+// @Summary		删除文件分类
+// @Description	删除文件分类
+// @Accept		json
+// @Produce		json
+// @Param		Authorization	header		string	true	"token"
+// @Param		id path int true	"ID"
+// @Success		200		{object}	model.AdminUser		""
+// @Failure		200		{object}	app.Response	    ""
+// @Router		/adminapi/filecategory/{id} [delete]
 func (c *File) DeleteFilecategoryBy(id uint32) {
 	var categoryIDs []uint32
 	categoryIDs = append(categoryIDs, id)
