@@ -4,12 +4,13 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2024-07-31 10:16:10
- * @LastEditTime: 2024-07-31 15:42:57
+ * @LastEditTime: 2024-08-02 10:20:24
  */
 package mq
 
 import (
 	"context"
+	"fmt"
 	"iris-project/global"
 	"log"
 	"strconv"
@@ -57,18 +58,30 @@ type (
 		ExchangeKind string // 交换器类型 direct, fanout, topic, headers
 		RouteKey     string // 路由名称
 		QueueName    string // 队列名称
+		InitDelay    bool   // 是否需要延时队列
 	}
 
 	// 消费者回调方法
 	Consumer func(amqp.Delivery)
 )
 
-func New(exchangeName, exchangeKind, routeKey, queueName string) (*MessageQueue, error) {
+// New 新建一个交换机，注意要调用Consume(fn Consumer)初始消费者，如：
+//
+//	    var mq, err = mq.New(exchangeName, exchangeKind, routeKey, queueName, true)
+//
+//		go func() {
+//			// 执行消费
+//			mq.Consume(func(d amqp.Delivery) {
+//				log.Printf("消费者收到消息：%s\n", string(d.Body))
+//			})
+//		}()
+func New(exchangeName, exchangeKind, routeKey, queueName string, initDelay bool) (*MessageQueue, error) {
 	var mq = &MessageQueue{
 		ExchangeName: exchangeName,
 		ExchangeKind: exchangeKind,
 		RouteKey:     routeKey,
 		QueueName:    queueName,
+		InitDelay:    initDelay,
 	}
 
 	channel, err := OpenChannel()
@@ -80,6 +93,38 @@ func New(exchangeName, exchangeKind, routeKey, queueName string) (*MessageQueue,
 
 	if err := mq.declareExchange(channel, exchangeName, exchangeKind, nil); err != nil {
 		return nil, err
+	}
+
+	// 声明队列
+	q, err := mq.declareQueue(channel, mq.QueueName, nil)
+	if err != nil {
+		log.Printf("[队列: %s]声明失败：%s\n", mq.QueueName, err.Error())
+		return nil, err
+	}
+
+	// 队列绑定到exchange
+	mq.bindQueue(channel, q.Name, mq.RouteKey, mq.ExchangeName)
+
+	if initDelay {
+		// delayQueueName := mq.QueueName + "_delay"
+		// delayRouteKey := mq.RouteKey + "_delay"
+		// 定义延迟队列(死信队列)
+		dq, err := mq.declareQueue(
+			channel,
+			getDelayName(mq.QueueName), //delayQueueName,
+			amqp.Table{
+				"x-dead-letter-exchange":    mq.ExchangeName, // 过期消息exchange
+				"x-dead-letter-routing-key": mq.RouteKey,     // 过期消息routing-key
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// 延迟队列绑定到exchange
+		if err := mq.bindQueue(channel, dq.Name, getDelayName(mq.RouteKey), mq.ExchangeName); err != nil {
+			return nil, err
+		}
 	}
 
 	return mq, nil
@@ -115,9 +160,9 @@ func (mq *MessageQueue) SendMessage(message Message) error {
 // SendDelayMessage 发送延迟消息
 // 注意每次打开一个新通道用完即关闭，如大批量发送消息考虑使用一个已打开的通道
 func (mq *MessageQueue) SendDelayMessage(message Message) error {
-
-	delayQueueName := mq.QueueName + "_delay"
-	delayRouteKey := mq.RouteKey + "_delay"
+	if !mq.InitDelay {
+		return fmt.Errorf("[队列: %s]未初始化延时队列", mq.QueueName)
+	}
 
 	channel, err := OpenChannel()
 	if err != nil {
@@ -125,24 +170,6 @@ func (mq *MessageQueue) SendDelayMessage(message Message) error {
 		return err
 	}
 	defer CloseChannel(channel)
-
-	// 定义延迟队列(死信队列)
-	dq, err := mq.declareQueue(
-		channel,
-		delayQueueName,
-		amqp.Table{
-			"x-dead-letter-exchange":    mq.ExchangeName, // 过期消息exchange
-			"x-dead-letter-routing-key": mq.RouteKey,     // 过期消息routing-key
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	// 延迟队列绑定到exchange
-	if err := mq.bindQueue(channel, dq.Name, delayRouteKey, mq.ExchangeName); err != nil {
-		return err
-	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -152,7 +179,7 @@ func (mq *MessageQueue) SendDelayMessage(message Message) error {
 	// 发送消息，将消息发送到延迟队列，到期后自动路由到正常队列中
 	if err := channel.PublishWithContext(ctx,
 		mq.ExchangeName,
-		delayRouteKey,
+		getDelayName(mq.RouteKey), // delayRouteKey,
 		false,
 		false,
 		amqp.Publishing{
@@ -175,16 +202,6 @@ func (mq *MessageQueue) Consume(fn Consumer) {
 	}
 	// defer CloseChannel(channel) // 消费者不能关闭通道
 
-	// 声明队列
-	q, err := mq.declareQueue(channel, mq.QueueName, nil)
-	if err != nil {
-		log.Printf("[队列: %s]声明失败：%s\n", mq.QueueName, err.Error())
-		return
-	}
-
-	// 队列绑定到exchange
-	mq.bindQueue(channel, q.Name, mq.RouteKey, mq.ExchangeName)
-
 	// 设置Qos
 	err = channel.Qos(1, 0, false)
 	if err != nil {
@@ -194,13 +211,13 @@ func (mq *MessageQueue) Consume(fn Consumer) {
 
 	// 监听消息
 	msgs, err := channel.Consume(
-		q.Name, // queue name,
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		mq.QueueName, // queue name,
+		"",           // consumer
+		false,        // auto-ack
+		false,        // exclusive
+		false,        // no-local
+		false,        // no-wait
+		nil,          // args
 	)
 	if err != nil {
 		log.Printf("[队列: %s]消费者设置失败：%s\n", mq.QueueName, err.Error())
@@ -215,6 +232,10 @@ func (mq *MessageQueue) Consume(fn Consumer) {
 	}()
 
 	log.Printf("[队列: %s]等待接受消息\n", mq.QueueName)
+}
+
+func getDelayName(name string) string {
+	return name + "_delay"
 }
 
 // declareQueue 定义队列

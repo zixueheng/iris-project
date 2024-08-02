@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2024-07-30 10:48:59
- * @LastEditTime: 2024-07-31 14:43:36
+ * @LastEditTime: 2024-08-02 10:04:46
  */
 package middleware
 
@@ -42,7 +42,7 @@ var (
 
 func InitMq() {
 	var err error
-	MqDirect, err = mq.New(DIRECT_EXCHANGE, mq.DirectType, DIRECT_ROUTE_KEY, DIRECT_QUEUE)
+	MqDirect, err = mq.New(DIRECT_EXCHANGE, mq.DirectType, DIRECT_ROUTE_KEY, DIRECT_QUEUE, true)
 	if err != nil {
 		log.Fatalf("rabbit mq init error: %s", err.Error())
 	}
