@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-10-11 15:27:55
- * @LastEditTime: 2023-10-12 14:35:28
+ * @LastEditTime: 2024-10-12 09:58:36
  */
 package dao
 
@@ -25,8 +25,10 @@ type User struct {
 	Source    string           `gorm:"type:enum(\"miniprogram\",\"android\",\"ios\",\"\");default:\"\";comment:注册来源;" validate:"-" json:"source" comment:"注册来源"`
 	Status    int8             `gorm:"type:tinyint(1);default:1;comment:状态;" json:"status" validate:"numeric,oneof=1 -1" comment:"状态"` // 1显示 -1隐藏
 
-	Username string `json:"username" validate:"-" comment:"用户名"` // 关联表字段不能用 gorm:"-"
-	Password string `json:"password" validate:"-" comment:"密码"`  // 关联表字段不能用 gorm:"-"
+	// 以下关联表字段
+	// <-:false 允许读，禁止写（写入时不会报字段不存才的错误）
+	Username string `gorm:"<-:false" json:"username" validate:"-" comment:"用户名"` // 关联表字段不能用 gorm:"-"
+	Password string `gorm:"<-:false" json:"password" validate:"-" comment:"密码"`  // 关联表字段不能用 gorm:"-"
 }
 
 func Test_Find(t *testing.T) {

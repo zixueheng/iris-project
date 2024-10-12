@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-05 11:06:19
- * @LastEditTime: 2023-10-12 11:34:23
+ * @LastEditTime: 2024-10-08 09:58:02
  */
 package dao
 
@@ -541,6 +541,7 @@ type SearchListData struct {
 	Where                      map[string]interface{}
 	Not                        map[string]interface{} // map[string]interface{}{"name": []string{"jinzhu", "jinzhu 2"}}: `name NOT IN ("jinzhu", "jinzhu 2")`
 	Fields, Preloads, OrderBys []string
+	Joins                      []string // 注意字段要加表名，如：[]string{"left join emails on emails.user_id = users.id"}
 	Group                      string
 	Page, Size                 int
 	FindType                   string      // 查询方式：一般不传，其他 Scan
@@ -578,6 +579,9 @@ func (s *SearchListData) GetList(dest interface{}, total *int64) error {
 
 	for _, orderby := range s.OrderBys {
 		s.Tx = s.Tx.Order(orderby)
+	}
+	for _, join := range s.Joins {
+		s.Tx.Joins(join)
 	}
 
 	if s.FindType == "Scan" {
