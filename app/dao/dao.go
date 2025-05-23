@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2021-02-05 11:06:19
- * @LastEditTime: 2024-10-08 09:58:02
+ * @LastEditTime: 2025-05-23 15:51:07
  */
 package dao
 
@@ -158,11 +158,12 @@ func Count(tx *gorm.DB, model interface{}, where map[string]interface{}) (count 
 
 // QueryOpts 查询选项
 type QueryOpts struct {
-	Select  []string
-	OrderBy []string
-	Preload []string
-	Joins   []string // 如：[]string{"left join emails on emails.user_id = users.id"}
-	Group   string
+	Select      []string
+	OrderBy     []string
+	Preload     []string
+	Joins       []string            // 连表查询，如：[]string{"left join emails on emails.user_id = users.id"}
+	JoinsSelect map[string][]string // 有连表查询时，查询字段可以使用该属性，如：map["tableName"][]string{"filed1","filed2"}
+	Group       string
 	// Limit, Skip int
 }
 
@@ -181,6 +182,15 @@ func addQueryOpts(tx *gorm.DB, opts *QueryOpts) {
 	}
 	for _, join := range opts.Joins {
 		tx.Joins(join)
+	}
+	if opts.JoinsSelect != nil {
+		var s = []string{}
+		for table, fileds := range opts.JoinsSelect {
+			for _, filed := range fileds {
+				s = append(s, table+"."+filed)
+			}
+		}
+		tx.Select(s)
 	}
 	if opts.Group != "" {
 		tx.Group(opts.Group)

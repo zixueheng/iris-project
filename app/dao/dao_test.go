@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-10-11 15:27:55
- * @LastEditTime: 2024-10-12 09:58:36
+ * @LastEditTime: 2025-05-23 15:53:14
  */
 package dao
 
@@ -39,9 +39,14 @@ func Test_Find(t *testing.T) {
 	// t.Logf("%+v", user)
 
 	var opts = &QueryOpts{
-		Select:  []string{"iris_user.id", "iris_user.realname", "iris_user.nickname", "iris_user.phone", "iris_user_username.username", "iris_user_username.password"},
+		// Select:  []string{"iris_user.id", "iris_user.realname", "iris_user.nickname", "iris_user.phone", "iris_user_username.username", "iris_user_username.password"},
 		OrderBy: []string{"iris_user.id desc"},
 		Joins:   []string{"left join iris_user_username on iris_user_username.user_id = iris_user.id"},
+		JoinsSelect: map[string][]string{
+			// "iris_user":          {"id", "realname", "nickname", "phone"},
+			"iris_user":          {"*"},
+			"iris_user_username": {"username", "password"},
+		},
 	}
 	FindOneOpts(nil, user, map[string]interface{}{"iris_user.realname": "he"}, opts)
 	t.Logf("%+v\n", user)

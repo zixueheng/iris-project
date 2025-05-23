@@ -12,6 +12,9 @@ import (
 var MqConn *amqp.Connection
 
 func init() {
+	if !config.RabbitMQ.On {
+		return
+	}
 	var (
 		rabbitURL = fmt.Sprintf("amqp://%s:%s@%s:%d/",
 			config.RabbitMQ.Username,

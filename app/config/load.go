@@ -4,7 +4,7 @@
  * @Email: 356126067@qq.com
  * @Phone: 15215657185
  * @Date: 2023-02-01 16:15:07
- * @LastEditTime: 2024-07-30 11:42:38
+ * @LastEditTime: 2025-05-23 15:54:52
  */
 package config
 
@@ -110,6 +110,7 @@ var (
 
 	// RabbitMQ 消息队列配置
 	RabbitMQ = struct {
+		On       bool
 		IP       string
 		Username string
 		Password string
